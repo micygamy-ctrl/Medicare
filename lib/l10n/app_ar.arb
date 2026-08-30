@@ -1,0 +1,43 @@
+{
+  "@@locale": "ar",
+  "appName": "Med Care",
+  "appTagline": "رعاية صحية ومتابعة دقيقة للأدوية",
+  
+  "login": "تسجيل الدخول",
+  "register": "إنشاء حساب جديد",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "confirmPassword": "تأكيد كلمة المرور",
+  "fullName": "الاسم الكامل",
+  "selectRole": "اختر نوع الحساب",
+  
+  "patient": "مريض",
+  "patientSubtitle": "متابعة الأدوية والقياسات الصحية",
+  "caregiver": "مقدم رعاية",
+  "caregiverSubtitle": "متابعة التزام مريض قريب لك",
+  "doctor": "طبيب معالج",
+  "doctorSubtitle": "متابعة المرضى وتحديث الروشتات",
+
+  "specialization": "التخصص الطبي",
+  "licenseNumber": "رقم الترخيص الطبي",
+  "enterSpecialization": "أدخل تخصصك الطبي",
+  "enterLicenseNumber": "أدخل رقم الترخيص النقابي/الطبي",
+
+  "disclaimerTitle": "إخلاء مسؤولية طبي وشروط الاستخدام",
+  "disclaimerAccept": "أوافق وأفهم الشروط الطبية",
+  
+  "doctorDashboard": "لوحة متابعة الطبيب",
+  "myPatients": "مرضاي المسجلين",
+  "addPatient": "إضافة مريض جديد",
+  "adherenceRate": "نسبة الالتزام بالأدوية",
+  "missedDosesAlert": "جرعات فائتة تحتاج لمتابعة",
+  "viewHealthProfile": "الملف الطبي الشامل",
+  "prescriptions": "الروشتات والأدوية",
+  "addPrescription": "إضافة روشتة / دواء جديد",
+
+  "language": "اللغة",
+  "arabic": "العربية",
+  "english": "English",
+  "settings": "الإعدادات",
+  "logout": "تسجيل الخروج"
+}

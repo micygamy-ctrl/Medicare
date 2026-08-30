@@ -1,0 +1,43 @@
+{
+  "@@locale": "en",
+  "appName": "Med Care",
+  "appTagline": "Healthcare & Medication Monitoring",
+  
+  "login": "Login",
+  "register": "Create New Account",
+  "email": "Email Address",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "fullName": "Full Name",
+  "selectRole": "Select Account Type",
+  
+  "patient": "Patient",
+  "patientSubtitle": "Track medications & vitals",
+  "caregiver": "Caregiver",
+  "caregiverSubtitle": "Monitor a patient's adherence",
+  "doctor": "Doctor / Physician",
+  "doctorSubtitle": "Monitor patients & update prescriptions",
+
+  "specialization": "Medical Specialization",
+  "licenseNumber": "Medical License Number",
+  "enterSpecialization": "Enter your specialization",
+  "enterLicenseNumber": "Enter your medical license ID",
+
+  "disclaimerTitle": "Medical Disclaimer & Terms",
+  "disclaimerAccept": "I Agree & Accept Terms",
+  
+  "doctorDashboard": "Doctor Dashboard",
+  "myPatients": "My Patients",
+  "addPatient": "Link New Patient",
+  "adherenceRate": "Medication Adherence Rate",
+  "missedDosesAlert": "Missed Doses Alert",
+  "viewHealthProfile": "View Medical Record",
+  "prescriptions": "Prescriptions & Medications",
+  "addPrescription": "Add Prescription / Medication",
+
+  "language": "Language",
+  "arabic": "العربية",
+  "english": "English",
+  "settings": "Settings",
+  "logout": "Logout"
+}
