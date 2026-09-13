@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/localization/app_language_cubit.dart';
+import '../../core/localization/app_strings.dart';
 import '../../domain/entities/user.dart';
 import '../auth/cubit/auth_cubit.dart';
-import '../shared/cubit/locale_cubit.dart';
+import '../shared/widgets/app_drawer.dart';
 import '../shared/widgets/medical_disclaimer_dialog.dart';
 import 'dashboard/pages/doctor_dashboard_page.dart';
 
@@ -35,6 +37,11 @@ class _DoctorMainPageState extends State<DoctorMainPage> {
         ];
 
         return Scaffold(
+          drawer: AppDrawer(
+            user: doctor,
+            selectedIndex: _currentIndex,
+            onSelectMainItem: (index) => setState(() => _currentIndex = index),
+          ),
           body: pages[_currentIndex],
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: _currentIndex,
@@ -48,14 +55,14 @@ class _DoctorMainPageState extends State<DoctorMainPage> {
               fontFamily: 'Cairo',
             ),
             onTap: (index) => setState(() => _currentIndex = index),
-            items: const [
+            items: [
               BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard_rounded),
-                label: 'لوحة التحكم',
+                icon: const Icon(Icons.dashboard_rounded),
+                label: AppStrings.menuDoctorDashboard,
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.person_rounded),
-                label: 'الملف الشخصي',
+                icon: const Icon(Icons.person_rounded),
+                label: AppStrings.tabProfile,
               ),
             ],
           ),
@@ -67,9 +74,9 @@ class _DoctorMainPageState extends State<DoctorMainPage> {
   Widget _buildDoctorProfilePage(BuildContext context, UserEntity doctor) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'ملف الطبيب والإعدادات',
-          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+        title: Text(
+          AppStrings.doctorProfileTitle,
+          style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -110,7 +117,8 @@ class _DoctorMainPageState extends State<DoctorMainPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'د. ${doctor.displayName}',
+                          AppStrings.pick('د. ${doctor.displayName}',
+                              'Dr. ${doctor.displayName}'),
                           style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 18,
@@ -120,7 +128,8 @@ class _DoctorMainPageState extends State<DoctorMainPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          doctor.specialization ?? 'طبيب معالج',
+                          doctor.specialization ??
+                              AppStrings.doctorDefaultSpecialty,
                           style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 14,
@@ -131,7 +140,7 @@ class _DoctorMainPageState extends State<DoctorMainPage> {
                         if (doctor.licenseNumber != null) ...[
                           const SizedBox(height: 2),
                           Text(
-                            'ترخيص رقم: ${doctor.licenseNumber}',
+                            AppStrings.licenseNumber(doctor.licenseNumber!),
                             style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 12,
@@ -148,31 +157,28 @@ class _DoctorMainPageState extends State<DoctorMainPage> {
             const SizedBox(height: 24),
 
             // Language Switcher Tile
-            BlocBuilder<LocaleCubit, Locale>(
-              builder: (context, locale) {
-                final isAr = locale.languageCode == 'ar';
+            BlocBuilder<AppLanguageCubit, AppLanguageState>(
+              builder: (context, langState) {
                 return ListTile(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14)),
                   tileColor: Colors.white,
                   leading: const Icon(Icons.language_rounded,
                       color: AppColors.primary),
-                  title: const Text(
-                    'تغيير لغة التطبيق',
-                    style: TextStyle(
+                  title: Text(
+                    AppStrings.menuLanguage,
+                    style: const TextStyle(
                         fontFamily: 'Cairo', fontWeight: FontWeight.w600),
                   ),
                   subtitle: Text(
-                    isAr ? 'العربية' : 'English',
+                    AppStrings.currentLanguage,
                     style: const TextStyle(fontFamily: 'Cairo'),
                   ),
                   trailing: Switch(
-                    value: !isAr,
+                    value: !langState.isArabic,
                     activeColor: AppColors.primary,
                     onChanged: (val) {
-                      context
-                          .read<LocaleCubit>()
-                          .changeLocale(val ? 'en' : 'ar');
+                      context.read<AppLanguageCubit>().toggleLanguage();
                     },
                   ),
                 );
@@ -187,14 +193,14 @@ class _DoctorMainPageState extends State<DoctorMainPage> {
               tileColor: Colors.white,
               leading:
                   const Icon(Icons.gavel_rounded, color: AppColors.primary),
-              title: const Text(
-                'إخلاء المسؤولية الطبي والشروط',
+              title: Text(
+                AppStrings.medicalDisclaimerTerms,
                 style:
-                    TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w600),
+                    const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w600),
               ),
-              subtitle: const Text(
-                'عرض معايير منظمة الصحة العالمية والخصوصية',
-                style: TextStyle(fontFamily: 'Cairo', fontSize: 12),
+              subtitle: Text(
+                AppStrings.medicalDisclaimerSubtitle,
+                style: const TextStyle(fontFamily: 'Cairo', fontSize: 12),
               ),
               trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
               onTap: () {
@@ -209,9 +215,9 @@ class _DoctorMainPageState extends State<DoctorMainPage> {
                   borderRadius: BorderRadius.circular(14)),
               tileColor: Colors.red.shade50,
               leading: const Icon(Icons.logout_rounded, color: Colors.red),
-              title: const Text(
-                'تسجيل الخروج',
-                style: TextStyle(
+              title: Text(
+                AppStrings.signOut,
+                style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.bold,
                   color: Colors.red,

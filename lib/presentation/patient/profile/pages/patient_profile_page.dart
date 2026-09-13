@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/localization/app_language_cubit.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../domain/entities/user.dart';
@@ -33,12 +35,25 @@ class _PatientProfilePageState extends State<PatientProfilePage> {
   final _newAllergyController = TextEditingController();
 
   final List<String> _bloodTypes = [
-    'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'
+    'A+',
+    'A-',
+    'B+',
+    'B-',
+    'AB+',
+    'AB-',
+    'O+',
+    'O-'
   ];
 
   final List<String> _commonDiseases = [
-    'السكري', 'ضغط الدم', 'أمراض القلب', 'الربو',
-    'الكلى', 'الكبد', 'الغدة الدرقية', 'هشاشة العظام'
+    'السكري',
+    'ضغط الدم',
+    'أمراض القلب',
+    'الربو',
+    'الكلى',
+    'الكبد',
+    'الغدة الدرقية',
+    'هشاشة العظام'
   ];
 
   @override
@@ -47,10 +62,8 @@ class _PatientProfilePageState extends State<PatientProfilePage> {
     _phoneController.text = widget.user.phone ?? '';
     _doctorController.text = widget.user.doctorName ?? '';
     _notesController.text = widget.user.notes ?? '';
-    _emergencyNameController.text =
-        widget.user.emergencyContactName ?? '';
-    _emergencyPhoneController.text =
-        widget.user.emergencyContactPhone ?? '';
+    _emergencyNameController.text = widget.user.emergencyContactName ?? '';
+    _emergencyPhoneController.text = widget.user.emergencyContactPhone ?? '';
     _dateOfBirth = widget.user.dateOfBirth;
     _gender = widget.user.gender;
     _bloodType = widget.user.bloodType;
@@ -83,90 +96,105 @@ class _PatientProfilePageState extends State<PatientProfilePage> {
 
   BloodType? _bloodTypeFromString(String value) {
     switch (value) {
-      case 'A+': return BloodType.aPositive;
-      case 'A-': return BloodType.aNegative;
-      case 'B+': return BloodType.bPositive;
-      case 'B-': return BloodType.bNegative;
-      case 'AB+': return BloodType.abPositive;
-      case 'AB-': return BloodType.abNegative;
-      case 'O+': return BloodType.oPositive;
-      case 'O-': return BloodType.oNegative;
-      default: return null;
+      case 'A+':
+        return BloodType.aPositive;
+      case 'A-':
+        return BloodType.aNegative;
+      case 'B+':
+        return BloodType.bPositive;
+      case 'B-':
+        return BloodType.bNegative;
+      case 'AB+':
+        return BloodType.abPositive;
+      case 'AB-':
+        return BloodType.abNegative;
+      case 'O+':
+        return BloodType.oPositive;
+      case 'O-':
+        return BloodType.oNegative;
+      default:
+        return null;
     }
   }
 
   String _bloodTypeToString(BloodType? type) {
     switch (type) {
-      case BloodType.aPositive: return 'A+';
-      case BloodType.aNegative: return 'A-';
-      case BloodType.bPositive: return 'B+';
-      case BloodType.bNegative: return 'B-';
-      case BloodType.abPositive: return 'AB+';
-      case BloodType.abNegative: return 'AB-';
-      case BloodType.oPositive: return 'O+';
-      case BloodType.oNegative: return 'O-';
-      default: return 'غير محدد';
+      case BloodType.aPositive:
+        return 'A+';
+      case BloodType.aNegative:
+        return 'A-';
+      case BloodType.bPositive:
+        return 'B+';
+      case BloodType.bNegative:
+        return 'B-';
+      case BloodType.abPositive:
+        return 'AB+';
+      case BloodType.abNegative:
+        return 'AB-';
+      case BloodType.oPositive:
+        return 'O+';
+      case BloodType.oNegative:
+        return 'O-';
+      default:
+        return 'غير محدد';
     }
   }
 
-void _onSave() async {
-  if (_formKey.currentState!.validate()) {
-    await context.read<AuthCubit>().updateProfile(
-      userId: widget.user.uid,
-      phone: _phoneController.text.trim().isEmpty
-          ? null
-          : _phoneController.text.trim(),
-      dateOfBirth: _dateOfBirth,
-      gender: _gender,
-      bloodType: _bloodType,
-      chronicDiseases: _chronicDiseases,
-      allergies: _allergies,
-      emergencyContactName:
-          _emergencyNameController.text.trim().isEmpty
-              ? null
-              : _emergencyNameController.text.trim(),
-      emergencyContactPhone:
-          _emergencyPhoneController.text.trim().isEmpty
-              ? null
-              : _emergencyPhoneController.text.trim(),
-      doctorName: _doctorController.text.trim().isEmpty
-          ? null
-          : _doctorController.text.trim(),
-      notes: _notesController.text.trim().isEmpty
-          ? null
-          : _notesController.text.trim(),
-    );
+  void _onSave() async {
+    if (_formKey.currentState!.validate()) {
+      await context.read<AuthCubit>().updateProfile(
+            userId: widget.user.uid,
+            phone: _phoneController.text.trim().isEmpty
+                ? null
+                : _phoneController.text.trim(),
+            dateOfBirth: _dateOfBirth,
+            gender: _gender,
+            bloodType: _bloodType,
+            chronicDiseases: _chronicDiseases,
+            allergies: _allergies,
+            emergencyContactName: _emergencyNameController.text.trim().isEmpty
+                ? null
+                : _emergencyNameController.text.trim(),
+            emergencyContactPhone: _emergencyPhoneController.text.trim().isEmpty
+                ? null
+                : _emergencyPhoneController.text.trim(),
+            doctorName: _doctorController.text.trim().isEmpty
+                ? null
+                : _doctorController.text.trim(),
+            notes: _notesController.text.trim().isEmpty
+                ? null
+                : _notesController.text.trim(),
+          );
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تم حفظ الملف الطبي بنجاح ✓'),
-          backgroundColor: AppColors.success,
-        ),
-      );
-      Navigator.pop(context);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تم حفظ الملف الطبي بنجاح ✓'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        Navigator.pop(context);
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-     appBar: AppBar(
-  title: const Text('ملفي الطبي'),
-  automaticallyImplyLeading: false,
-  actions: [
-    BlocBuilder<AuthCubit, AuthState>(
-      builder: (context, state) {
-        return IconButton(
-          icon: const Icon(Icons.logout_rounded),
-          onPressed: () => context.read<AuthCubit>().signOut(),
-        );
-      },
-    ),
-  ],
-),
+      appBar: AppBar(
+        title: const Text('ملفي الطبي'),
+        actions: [
+          BlocBuilder<AuthCubit, AuthState>(
+            builder: (context, state) {
+              return IconButton(
+                icon: const Icon(Icons.logout_rounded),
+                onPressed: () => context.read<AuthCubit>().signOut(),
+              );
+            },
+          ),
+        ],
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -176,10 +204,72 @@ void _onSave() async {
             children: [
               // Header Card
               _ProfileHeader(user: widget.user),
+              const SizedBox(height: 20),
+
+              // Language Switcher Tile inside Profile Page
+              BlocBuilder<AppLanguageCubit, AppLanguageState>(
+                builder: (context, langState) {
+                  return Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondaryLight,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                          color: AppColors.secondary.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.language_rounded,
+                                color: AppColors.secondary),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppStrings.menuLanguage,
+                                  style: const TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: AppColors.secondary,
+                                  ),
+                                ),
+                                Text(
+                                  langState.isArabic
+                                      ? 'اللغة الحالية: العربية'
+                                      : 'Current Language: English',
+                                  style: const TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontSize: 11,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          value: !langState.isArabic,
+                          activeColor: AppColors.secondary,
+                          onChanged: (_) {
+                            context.read<AppLanguageCubit>().toggleLanguage();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
               const SizedBox(height: 24),
 
               // القسم الأول — البيانات الشخصية
-              _SectionTitle(title: 'البيانات الشخصية', icon: Icons.person_outline_rounded),
+              _SectionTitle(
+                  title: 'البيانات الشخصية',
+                  icon: Icons.person_outline_rounded),
               const SizedBox(height: 12),
 
               // الهاتف
@@ -191,8 +281,8 @@ void _onSave() async {
                 textDirection: TextDirection.ltr,
                 decoration: const InputDecoration(
                   hintText: '+20 1XX XXX XXXX',
-                  prefixIcon: Icon(Icons.phone_outlined,
-                      color: AppColors.textHint),
+                  prefixIcon:
+                      Icon(Icons.phone_outlined, color: AppColors.textHint),
                 ),
               ),
               const SizedBox(height: 16),
@@ -203,8 +293,8 @@ void _onSave() async {
               GestureDetector(
                 onTap: _pickDateOfBirth,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(12),
@@ -270,11 +360,10 @@ void _onSave() async {
                 spacing: 8,
                 runSpacing: 8,
                 children: _bloodTypes.map((type) {
-                  final isSelected =
-                      _bloodTypeToString(_bloodType) == type;
+                  final isSelected = _bloodTypeToString(_bloodType) == type;
                   return GestureDetector(
-                    onTap: () => setState(
-                        () => _bloodType = _bloodTypeFromString(type)),
+                    onTap: () =>
+                        setState(() => _bloodType = _bloodTypeFromString(type)),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.symmetric(
@@ -297,9 +386,8 @@ void _onSave() async {
                           color: isSelected
                               ? AppColors.error
                               : AppColors.textPrimary,
-                          fontWeight: isSelected
-                              ? FontWeight.w700
-                              : FontWeight.w400,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w400,
                         ),
                       ),
                     ),
@@ -357,8 +445,11 @@ void _onSave() async {
                       title: 'إضافة حساسية',
                       controller: _newAllergyController,
                       suggestions: const [
-                        'البنسلين', 'الأسبرين', 'الإيبوبروفين',
-                        'السلفا', 'الكودايين'
+                        'البنسلين',
+                        'الأسبرين',
+                        'الإيبوبروفين',
+                        'السلفا',
+                        'الكودايين'
                       ],
                       onAdd: (value) {
                         if (!_allergies.contains(value)) {
@@ -414,8 +505,8 @@ void _onSave() async {
                 controller: _emergencyNameController,
                 decoration: const InputDecoration(
                   hintText: 'اسم شخص الطوارئ',
-                  prefixIcon: Icon(Icons.person_outline,
-                      color: AppColors.textHint),
+                  prefixIcon:
+                      Icon(Icons.person_outline, color: AppColors.textHint),
                 ),
               ),
               const SizedBox(height: 16),
@@ -428,8 +519,8 @@ void _onSave() async {
                 textDirection: TextDirection.ltr,
                 decoration: const InputDecoration(
                   hintText: '+20 1XX XXX XXXX',
-                  prefixIcon: Icon(Icons.phone_outlined,
-                      color: AppColors.textHint),
+                  prefixIcon:
+                      Icon(Icons.phone_outlined, color: AppColors.textHint),
                 ),
               ),
               const SizedBox(height: 16),
@@ -464,8 +555,7 @@ void _onSave() async {
     final now = DateTime.now();
     int age = now.year - _dateOfBirth!.year;
     if (now.month < _dateOfBirth!.month ||
-        (now.month == _dateOfBirth!.month &&
-            now.day < _dateOfBirth!.day)) {
+        (now.month == _dateOfBirth!.month && now.day < _dateOfBirth!.day)) {
       age--;
     }
     return age;
@@ -513,12 +603,11 @@ void _onSave() async {
                           decoration: BoxDecoration(
                             color: AppColors.primaryLight,
                             borderRadius: BorderRadius.circular(20),
-                            border:
-                                Border.all(color: AppColors.primary),
+                            border: Border.all(color: AppColors.primary),
                           ),
                           child: Text(s,
-                              style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.primary)),
+                              style: AppTextStyles.bodySmall
+                                  .copyWith(color: AppColors.primary)),
                         ),
                       ))
                   .toList(),
@@ -669,29 +758,23 @@ class _GenderCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color:
-              isSelected ? AppColors.primaryLight : AppColors.surface,
+          color: isSelected ? AppColors.primaryLight : AppColors.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color:
-                isSelected ? AppColors.primary : AppColors.cardBorder,
+            color: isSelected ? AppColors.primary : AppColors.cardBorder,
             width: isSelected ? 2 : 1,
           ),
         ),
         child: Column(
           children: [
             Icon(icon,
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textSecondary,
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
                 size: 28),
             const SizedBox(height: 8),
             Text(
               label,
               style: AppTextStyles.label.copyWith(
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textPrimary,
+                color: isSelected ? AppColors.primary : AppColors.textPrimary,
               ),
             ),
           ],
@@ -716,8 +799,7 @@ class _RemovableChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
@@ -726,9 +808,7 @@ class _RemovableChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label,
-              style:
-                  AppTextStyles.bodySmall.copyWith(color: color)),
+          Text(label, style: AppTextStyles.bodySmall.copyWith(color: color)),
           const SizedBox(width: 6),
           GestureDetector(
             onTap: onRemove,
@@ -749,17 +829,15 @@ class _EmptyChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-            color: AppColors.cardBorder, style: BorderStyle.solid),
+        border:
+            Border.all(color: AppColors.cardBorder, style: BorderStyle.solid),
       ),
       child: Text(label,
-          style: AppTextStyles.bodySmall
-              .copyWith(color: AppColors.textHint)),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textHint)),
     );
   }
 }

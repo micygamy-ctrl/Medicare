@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../domain/entities/medication.dart';
 import '../cubit/medication_cubit.dart';
 import 'edit_medication_page.dart';
@@ -41,12 +42,11 @@ class _MedicationListPageState extends State<MedicationListPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('أدويتي (بالهوية البصرية)'),
-        automaticallyImplyLeading: false,
+        title: Text(AppStrings.myMedications),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_active_outlined),
-            tooltip: 'اختبار الإشعار',
+            tooltip: AppStrings.testNotification,
             onPressed: () async {
               final state = context.read<MedicationCubit>().state;
               if (state is MedicationLoaded && state.medications.isNotEmpty) {
@@ -58,8 +58,8 @@ class _MedicationListPageState extends State<MedicationListPage> {
                 );
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('تم إرسال إشعار تجريبي 🔔'),
+                    SnackBar(
+                      content: Text(AppStrings.testNotificationSent),
                       backgroundColor: AppColors.success,
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -92,20 +92,16 @@ class _MedicationListPageState extends State<MedicationListPage> {
         listener: (context, state) {
           if (state is MedicationDeleted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم حذف الدواء بنجاح'),
+              SnackBar(
+                content: Text(AppStrings.medicationDeleted),
                 backgroundColor: AppColors.success,
                 behavior: SnackBarBehavior.floating,
               ),
             );
-            context
-                .read<MedicationCubit>()
-                .loadMedications(widget.patientId);
+            context.read<MedicationCubit>().loadMedications(widget.patientId);
           }
           if (state is MedicationUpdated) {
-            context
-                .read<MedicationCubit>()
-                .loadMedications(widget.patientId);
+            context.read<MedicationCubit>().loadMedications(widget.patientId);
           }
           if (state is MedicationError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -135,9 +131,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
           if (state is MedicationLoaded) {
             final filtered = state.medications
                 .where((m) =>
-                    m.name
-                        .toLowerCase()
-                        .contains(_searchQuery.toLowerCase()) ||
+                    m.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
                     m.nameAr.contains(_searchQuery))
                 .toList();
 
@@ -150,7 +144,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
                     controller: _searchController,
                     onChanged: (value) => setState(() => _searchQuery = value),
                     decoration: InputDecoration(
-                      hintText: 'ابحث عن دواء بالاسم أو اللون...',
+                      hintText: AppStrings.medicationSearchHint,
                       prefixIcon: const Icon(Icons.search_rounded,
                           color: AppColors.textHint),
                       suffixIcon: _searchQuery.isNotEmpty
@@ -187,12 +181,12 @@ class _MedicationListPageState extends State<MedicationListPage> {
                 // Stats Bar
                 if (state.medications.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     child: Row(
                       children: [
                         Text(
-                          '${filtered.length} دواء مسجل',
+                          AppStrings.medicationCount(filtered.length),
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textSecondary,
                             fontWeight: FontWeight.bold,
@@ -246,16 +240,17 @@ class _MedicationListPageState extends State<MedicationListPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('حذف الدواء', style: TextStyle(fontFamily: 'Cairo')),
+        title: Text(AppStrings.delete,
+            style: const TextStyle(fontFamily: 'Cairo')),
         content: Text(
-          'هل تريد حذف ${medication.name}؟',
+          AppStrings.deleteMedicationQuestion(medication.name),
           style: const TextStyle(fontFamily: 'Cairo'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child:
-                const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo')),
+            child: Text(AppStrings.cancel,
+                style: const TextStyle(fontFamily: 'Cairo')),
           ),
           ElevatedButton(
             onPressed: () {
@@ -263,7 +258,8 @@ class _MedicationListPageState extends State<MedicationListPage> {
               context.read<MedicationCubit>().deleteMedication(medication.id);
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('حذف', style: TextStyle(fontFamily: 'Cairo')),
+            child: Text(AppStrings.delete,
+                style: const TextStyle(fontFamily: 'Cairo')),
           ),
         ],
       ),
@@ -300,14 +296,14 @@ class _EmptyView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            isSearching ? 'لا توجد نتائج' : 'لا توجد أدوية',
+            isSearching ? AppStrings.noResults : AppStrings.noMedications,
             style: AppTextStyles.h3,
           ),
           const SizedBox(height: 8),
           Text(
             isSearching
-                ? 'جرب البحث بكلمة أخرى'
-                : 'اضغط + لإضافة دوائك الأول',
+                ? AppStrings.tryAnotherSearch
+                : AppStrings.addFirstMedication,
             style: AppTextStyles.bodyMedium
                 .copyWith(color: AppColors.textSecondary),
           ),
@@ -375,8 +371,8 @@ class _MedicationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final boxColor = _getBoxColor();
-    final hasPhoto = medication.boxImageUrl != null &&
-        medication.boxImageUrl!.isNotEmpty;
+    final hasPhoto =
+        medication.boxImageUrl != null && medication.boxImageUrl!.isNotEmpty;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

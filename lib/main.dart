@@ -29,53 +29,46 @@ import 'core/utils/background_service.dart';
 import 'package:workmanager/workmanager.dart';
 import 'core/utils/connectivity_service.dart';
 import 'core/utils/alarm_service.dart';
+import 'core/localization/app_language_cubit.dart';
+import 'core/localization/app_strings.dart';
+import 'l10n/app_localizations.dart';
 
 @pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(
-    RemoteMessage message) async {
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  print('Background message: ${message.messageId}');
+  debugPrint('Background message: ${message.messageId}');
 }
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // FCM Background Handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // طلب إذن الإشعارات
   await FirebaseMessaging.instance.requestPermission(
     alert: true,
     badge: true,
     sound: true,
   );
 
-  // الحصول على الـ FCM Token
   final fcmToken = await FirebaseMessaging.instance.getToken();
-  print('FCM Token: $fcmToken');
+  debugPrint('FCM Token: $fcmToken');
 
   await setupDependencies();
   await NotificationScheduler.initialize();
-
-  // Initialize Alarm Service
   await AlarmService.initialize();
-
-  // Initialize Connectivity Service
   ConnectivityService().initialize();
 
-  // WorkManager Background Tasks
   await Workmanager().initialize(
     callbackDispatcher,
     isInDebugMode: false,
   );
 
-  // جدولة التذكيرات كل 15 دقيقة
   await Workmanager().registerPeriodicTask(
     'medication-reminders',
     medicationReminderTask,
@@ -91,9 +84,6 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(const MediCareApp());
-
-  // Global Error Handler
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
     FirebaseCrashlytics.instance.recordFlutterFatalError(details);
@@ -103,6 +93,8 @@ void main() async {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
+
+  runApp(const MediCareApp());
 }
 
 class MediCareApp extends StatelessWidget {
@@ -121,23 +113,35 @@ class MediCareApp extends StatelessWidget {
         BlocProvider(
           create: (_) => LocaleCubit(),
         ),
+        BlocProvider(
+          create: (_) => AppLanguageCubit(),
+        ),
       ],
-      child: BlocBuilder<LocaleCubit, Locale>(
-        builder: (context, locale) {
+      child: BlocBuilder<AppLanguageCubit, AppLanguageState>(
+        builder: (context, langState) {
+          AppStrings.setLanguage(langState.language);
+
           return MaterialApp(
-            title: 'Med Care',
+            title: AppStrings.appTitle,
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
-            locale: locale,
+            locale: langState.locale,
             supportedLocales: const [
               Locale('ar'),
               Locale('en'),
             ],
             localizationsDelegates: const [
+              AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
+            builder: (context, child) {
+              return Directionality(
+                textDirection: langState.textDirection,
+                child: child ?? const SizedBox.shrink(),
+              );
+            },
             initialRoute: '/',
             routes: {
               '/': (context) => const SplashPage(),

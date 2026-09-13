@@ -27,7 +27,7 @@ class CaregiverProfilePage extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [AppColors.secondary, AppColors.secondaryDark],
+                  colors: [AppColors.secondary, Color(0xFF3730A3)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),

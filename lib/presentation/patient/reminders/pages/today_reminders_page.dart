@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../domain/entities/intake_log.dart';
 import '../cubit/reminder_cubit.dart';
 import '../../../shared/widgets/error_view.dart';
@@ -26,30 +27,32 @@ class _TodayRemindersPageState extends State<TodayRemindersPage> {
     final now = DateTime.now();
     final days = [
       '',
-      'الإثنين',
-      'الثلاثاء',
-      'الأربعاء',
-      'الخميس',
-      'الجمعة',
-      'السبت',
-      'الأحد'
+      AppStrings.pick('الإثنين', 'Monday'),
+      AppStrings.pick('الثلاثاء', 'Tuesday'),
+      AppStrings.pick('الأربعاء', 'Wednesday'),
+      AppStrings.pick('الخميس', 'Thursday'),
+      AppStrings.pick('الجمعة', 'Friday'),
+      AppStrings.pick('السبت', 'Saturday'),
+      AppStrings.pick('الأحد', 'Sunday')
     ];
     final months = [
       '',
-      'يناير',
-      'فبراير',
-      'مارس',
-      'إبريل',
-      'مايو',
-      'يونيو',
-      'يوليو',
-      'أغسطس',
-      'سبتمبر',
-      'أكتوبر',
-      'نوفمبر',
-      'ديسمبر'
+      AppStrings.pick('يناير', 'January'),
+      AppStrings.pick('فبراير', 'February'),
+      AppStrings.pick('مارس', 'March'),
+      AppStrings.pick('إبريل', 'April'),
+      AppStrings.pick('مايو', 'May'),
+      AppStrings.pick('يونيو', 'June'),
+      AppStrings.pick('يوليو', 'July'),
+      AppStrings.pick('أغسطس', 'August'),
+      AppStrings.pick('سبتمبر', 'September'),
+      AppStrings.pick('أكتوبر', 'October'),
+      AppStrings.pick('نوفمبر', 'November'),
+      AppStrings.pick('ديسمبر', 'December')
     ];
-    return '${days[now.weekday]}، ${now.day} ${months[now.month]}';
+    return AppStrings.isAr
+        ? '${days[now.weekday]}، ${now.day} ${months[now.month]}'
+        : '${days[now.weekday]}, ${months[now.month]} ${now.day}';
   }
 
   @override
@@ -59,7 +62,7 @@ class _TodayRemindersPageState extends State<TodayRemindersPage> {
       appBar: AppBar(
         title: Column(
           children: [
-            const Text('تذكيرات اليوم البصرية'),
+            Text(AppStrings.remindersTitle),
             Text(
               _getTodayDate(),
               style: const TextStyle(
@@ -150,10 +153,10 @@ class _EmptyRemindersView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text('لا توجد تذكيرات اليوم', style: AppTextStyles.h3),
+          Text(AppStrings.noRemindersToday, style: AppTextStyles.h3),
           const SizedBox(height: 8),
           Text(
-            'أضف أدوية لتظهر هنا ببطاقاتها البصرية',
+            AppStrings.addMedicationsToSeeReminders,
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -192,13 +195,13 @@ class _ReminderCard extends StatelessWidget {
   String _getStatusText() {
     switch (log.status) {
       case IntakeStatus.taken:
-        return 'تم التناول ✓';
+        return AppStrings.taken;
       case IntakeStatus.missed:
-        return 'فائتة ✗';
+        return AppStrings.missed;
       case IntakeStatus.snoozed:
-        return 'مؤجلة';
+        return AppStrings.snoozed;
       default:
-        return 'في الانتظار';
+        return AppStrings.pending;
     }
   }
 
@@ -285,7 +288,8 @@ class _ReminderCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'موعد الجرعة: ${log.scheduledTime.hour.toString().padLeft(2, '0')}:${log.scheduledTime.minute.toString().padLeft(2, '0')}',
+                            AppStrings.doseTime(
+                                '${log.scheduledTime.hour.toString().padLeft(2, '0')}:${log.scheduledTime.minute.toString().padLeft(2, '0')}'),
                             style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 13,
@@ -345,9 +349,9 @@ class _ReminderCard extends StatelessWidget {
                         ),
                         icon: const Icon(Icons.check_circle_rounded,
                             size: 22, color: Colors.white),
-                        label: const Text(
-                          'تناولت الدواء الآن',
-                          style: TextStyle(
+                        label: Text(
+                          AppStrings.takeNow,
+                          style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 15,
                             color: Colors.white,
@@ -373,9 +377,9 @@ class _ReminderCard extends StatelessWidget {
                         ),
                       ),
                       icon: const Icon(Icons.close_rounded, size: 20),
-                      label: const Text(
-                        'تخطي',
-                        style: TextStyle(
+                      label: Text(
+                        AppStrings.skip,
+                        style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

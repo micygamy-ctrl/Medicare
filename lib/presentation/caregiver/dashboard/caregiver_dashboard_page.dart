@@ -6,7 +6,10 @@ import '../../auth/cubit/auth_cubit.dart';
 import '../../../domain/repositories/i_pairing_repository.dart';
 import '../../../domain/repositories/i_medication_repository.dart';
 import '../../../domain/repositories/i_intake_log_repository.dart';
+import '../../../domain/repositories/i_vitals_repository.dart';
 import '../../../core/di/injection.dart';
+import '../../patient/vitals/cubit/vitals_cubit.dart';
+import '../../patient/vitals/pages/vitals_dashboard_page.dart';
 import 'cubit/dashboard_cubit.dart';
 
 class CaregiverDashboardPage extends StatelessWidget {
@@ -393,6 +396,51 @@ class _PatientCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+
+            // Smartwatch & Vitals Monitoring Button
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider(
+                      create: (_) => VitalsCubit(getIt<IVitalsRepository>()),
+                      child: VitalsDashboardPage(patientId: summary.pair.patientId),
+                    ),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.watch_rounded, color: AppColors.primary, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          'مراقبة نبضات القلب والضغط والساعة الذكية',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.primary),
+                  ],
+                ),
+              ),
             ),
 
             // Alert

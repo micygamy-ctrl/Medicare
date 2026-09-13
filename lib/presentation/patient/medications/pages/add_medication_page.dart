@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../domain/entities/medication.dart';
@@ -43,16 +44,30 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
 
   final List<String> _units = ['mg', 'ml', 'g', 'IU', 'قرص', 'كبسولة'];
 
-  final List<Map<String, String>> _boxColors = [
-    {'name': 'أحمر', 'hex': 'E53935'},
-    {'name': 'أزرق', 'hex': '1E88E5'},
-    {'name': 'أخضر', 'hex': '4CAF50'},
-    {'name': 'أصفر', 'hex': 'FDD835'},
-    {'name': 'برتقالي', 'hex': 'FB8C00'},
-    {'name': 'بنفسجي', 'hex': '8E24AA'},
-    {'name': 'سماوي', 'hex': '00ACC1'},
-    {'name': 'بني', 'hex': '6D4C41'},
+  List<Map<String, String>> get _boxColors => [
+    {'nameKey': 'red',    'hex': 'E53935'},
+    {'nameKey': 'blue',   'hex': '1E88E5'},
+    {'nameKey': 'green',  'hex': '4CAF50'},
+    {'nameKey': 'yellow', 'hex': 'FDD835'},
+    {'nameKey': 'orange', 'hex': 'FB8C00'},
+    {'nameKey': 'purple', 'hex': '8E24AA'},
+    {'nameKey': 'cyan',   'hex': '00ACC1'},
+    {'nameKey': 'brown',  'hex': '6D4C41'},
   ];
+
+  String _colorName(String key) {
+    switch (key) {
+      case 'red':    return AppStrings.colorRed;
+      case 'blue':   return AppStrings.colorBlue;
+      case 'green':  return AppStrings.colorGreen;
+      case 'yellow': return AppStrings.colorYellow;
+      case 'orange': return AppStrings.colorOrange;
+      case 'purple': return AppStrings.colorPurple;
+      case 'cyan':   return AppStrings.colorCyan;
+      case 'brown':  return AppStrings.colorBrown;
+      default:       return key;
+    }
+  }
 
   @override
   void dispose() {
@@ -75,8 +90,8 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تعذر التقاط/اختيار الصورة'),
+        SnackBar(
+          content: Text(AppStrings.drugBoxPickError),
           backgroundColor: AppColors.error,
         ),
       );
@@ -115,8 +130,8 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
     if (_formKey.currentState!.validate()) {
       if (_selectedTimes.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('من فضلك أضف موعد واحد على الأقل'),
+          SnackBar(
+            content: Text(AppStrings.atLeastOneDoseTime),
             backgroundColor: AppColors.error,
           ),
         );
@@ -147,8 +162,8 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
       listener: (context, state) {
         if (state is MedicationAdded) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم إضافة الدواء بنجاح ✓'),
+            SnackBar(
+              content: Text(AppStrings.medicationAdded),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
             ),
@@ -167,9 +182,9 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
-          title: const Text(
-            'إضافة دواء جديد',
-            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+          title: Text(
+            AppStrings.addMedication,
+            style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
           ),
           backgroundColor: AppColors.surface,
         ),
@@ -188,14 +203,14 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppColors.primary.withOpacity(0.3)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.visibility_rounded, color: AppColors.primary, size: 28),
-                      SizedBox(width: 12),
+                      const Icon(Icons.visibility_rounded, color: AppColors.primary, size: 28),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'تخصيص الهوية البصرية لكبار السن والأميين (تصوير علبة الدواء واختيار لونها)',
-                          style: TextStyle(
+                          AppStrings.drugBoxVisualBanner,
+                          style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -209,7 +224,7 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                 const SizedBox(height: 20),
 
                 // Drug Box Camera / Photo Picker
-                Text('صورة علبة الدواء (اختياري)', style: AppTextStyles.label),
+                Text(AppStrings.drugBoxPhotoLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () {
@@ -224,9 +239,9 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text(
-                              'التقاط/اختيار صورة علبة الدواء',
-                              style: TextStyle(
+                            Text(
+                              AppStrings.drugBoxPickSheet,
+                              style: const TextStyle(
                                   fontFamily: 'Cairo',
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
@@ -235,8 +250,8 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                             ListTile(
                               leading: const Icon(Icons.camera_alt_rounded,
                                   color: AppColors.primary),
-                              title: const Text('الكاميرا المباشرة',
-                                  style: TextStyle(fontFamily: 'Cairo')),
+                              title: Text(AppStrings.drugBoxCamera,
+                                  style: const TextStyle(fontFamily: 'Cairo')),
                               onTap: () {
                                 Navigator.pop(context);
                                 _pickBoxImage(ImageSource.camera);
@@ -245,8 +260,8 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                             ListTile(
                               leading: const Icon(Icons.photo_library_rounded,
                                   color: AppColors.primary),
-                              title: const Text('معرض الصور',
-                                  style: TextStyle(fontFamily: 'Cairo')),
+                              title: Text(AppStrings.drugBoxGallery,
+                                  style: const TextStyle(fontFamily: 'Cairo')),
                               onTap: () {
                                 Navigator.pop(context);
                                 _pickBoxImage(ImageSource.gallery);
@@ -297,15 +312,15 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                               ],
                             ),
                           )
-                        : const Column(
+                        : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.add_a_photo_rounded,
+                              const Icon(Icons.add_a_photo_rounded,
                                   size: 36, color: AppColors.textHint),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
-                                'اضغط لتصوير علبة الدواء الحقيقية',
-                                style: TextStyle(
+                                AppStrings.drugBoxPickPrompt,
+                                style: const TextStyle(
                                     fontFamily: 'Cairo',
                                     fontSize: 13,
                                     color: AppColors.textSecondary),
@@ -317,7 +332,7 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                 const SizedBox(height: 20),
 
                 // Color Swatch Selector
-                Text('لون علبة / شريط الدواء', style: AppTextStyles.label),
+                Text(AppStrings.drugBoxColorLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 SizedBox(
                   height: 50,
@@ -331,33 +346,36 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                       final isSelected = _selectedColorHex == colorHex;
                       final color = Color(int.parse('0xFF$colorHex'));
 
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedColorHex = colorHex),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected
-                                  ? Colors.black
-                                  : Colors.transparent,
-                              width: isSelected ? 3 : 0,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: color.withOpacity(0.4),
-                                blurRadius: isSelected ? 8 : 4,
-                                offset: const Offset(0, 3),
+                      return Tooltip(
+                        message: _colorName(item['nameKey']!),
+                        child: GestureDetector(
+                          onTap: () => setState(() => _selectedColorHex = colorHex),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 46,
+                            height: 46,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? Colors.black
+                                    : Colors.transparent,
+                                width: isSelected ? 3 : 0,
                               ),
-                            ],
+                              boxShadow: [
+                                BoxShadow(
+                                  color: color.withOpacity(0.4),
+                                  blurRadius: isSelected ? 8 : 4,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: isSelected
+                                ? const Icon(Icons.check_rounded,
+                                    color: Colors.white, size: 24)
+                                : null,
                           ),
-                          child: isSelected
-                              ? const Icon(Icons.check_rounded,
-                                  color: Colors.white, size: 24)
-                              : null,
                         ),
                       );
                     },
@@ -365,8 +383,8 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                 ),
                 const SizedBox(height: 24),
 
-                // اسم الدواء
-                Text('اسم الدواء (إنجليزي)', style: AppTextStyles.label),
+                // Drug name (English)
+                Text(AppStrings.medNameEn, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _nameController,
@@ -378,15 +396,15 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'من فضلك أدخل اسم الدواء';
+                      return AppStrings.enterMedName;
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
 
-                // اسم الدواء عربي
-                Text('اسم الدواء (عربي)', style: AppTextStyles.label),
+                // Drug name (Arabic)
+                Text(AppStrings.medNameAr, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _nameArController,
@@ -399,8 +417,8 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // الجرعة والوحدة
-                Text('الجرعة', style: AppTextStyles.label),
+                // Dosage + unit
+                Text(AppStrings.dosageLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -413,7 +431,7 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                         decoration: const InputDecoration(hintText: '500'),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'أدخل الجرعة';
+                            return AppStrings.enterDosage;
                           }
                           return null;
                         },
@@ -437,8 +455,8 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // شكل الدواء
-                Text('شكل الدواء', style: AppTextStyles.label),
+                // Drug form
+                Text(AppStrings.formLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 _FormSelector(
                   selected: _selectedForm,
@@ -446,20 +464,20 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // تعليمات
-                Text('تعليمات', style: AppTextStyles.label),
+                // Instructions
+                Text(AppStrings.instructionsLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _instructionsController,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    hintText: 'مثال: تناول مع الطعام',
+                  decoration: InputDecoration(
+                    hintText: AppStrings.instructionsHint,
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // تاريخ البداية
-                Text('تاريخ البداية', style: AppTextStyles.label),
+                // Start date
+                Text(AppStrings.startDateLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 GestureDetector(
                   onTap: _pickStartDate,
@@ -488,11 +506,11 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // مواعيد الجرعات
+                // Dose times
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('مواعيد الجرعات', style: AppTextStyles.label),
+                    Text(AppStrings.doseTimesLabel, style: AppTextStyles.label),
                     TextButton.icon(
                       onPressed: () {
                         setState(() {
@@ -502,7 +520,7 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                         });
                       },
                       icon: const Icon(Icons.add, size: 18),
-                      label: const Text('إضافة موعد'),
+                      label: Text(AppStrings.addDoseTime),
                     ),
                   ],
                 ),
@@ -548,11 +566,11 @@ class _AddMedicationPageState extends State<AddMedicationPage> {
                 }),
                 const SizedBox(height: 32),
 
-                // زرار الحفظ
+                // Save button
                 BlocBuilder<MedicationCubit, MedicationState>(
                   builder: (context, state) {
                     return PrimaryButton(
-                      label: 'حفظ الدواء والهوية البصرية',
+                      label: AppStrings.saveMedButton,
                       isLoading: state is MedicationLoading,
                       onPressed: _onSave,
                     );
@@ -581,12 +599,12 @@ class _FormSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final forms = [
-      (MedicationForm.tablet, Icons.medication_rounded, 'قرص'),
-      (MedicationForm.capsule, Icons.medication_outlined, 'كبسولة'),
-      (MedicationForm.syrup, Icons.local_drink_outlined, 'شراب'),
-      (MedicationForm.injection, Icons.vaccines_outlined, 'حقنة'),
-      (MedicationForm.drops, Icons.water_drop_outlined, 'قطرة'),
-      (MedicationForm.cream, Icons.sanitizer_outlined, 'كريم'),
+      (MedicationForm.tablet,    Icons.medication_rounded,     AppStrings.formTablet),
+      (MedicationForm.capsule,   Icons.medication_outlined,    AppStrings.formCapsule),
+      (MedicationForm.syrup,     Icons.local_drink_outlined,   AppStrings.formSyrup),
+      (MedicationForm.injection, Icons.vaccines_outlined,      AppStrings.formInjection),
+      (MedicationForm.drops,     Icons.water_drop_outlined,    AppStrings.formDrops),
+      (MedicationForm.cream,     Icons.sanitizer_outlined,     AppStrings.formCream),
     ];
 
     return Wrap(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../domain/entities/user.dart';
 import '../../shared/widgets/primary_button.dart';
 import '../cubit/auth_cubit.dart';
@@ -88,14 +89,14 @@ class _LoginPageState extends State<LoginPage> {
 
                   Center(
                     child: Text(
-                      'مرحباً بك',
+                      AppStrings.loginWelcome,
                       style: AppTextStyles.h1,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Center(
                     child: Text(
-                      'سجّل دخولك للمتابعة',
+                      AppStrings.loginSubtitle,
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -104,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 48),
 
                   // Email
-                  Text('البريد الإلكتروني', style: AppTextStyles.label),
+                  Text(AppStrings.email, style: AppTextStyles.label),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _emailController,
@@ -112,15 +113,15 @@ class _LoginPageState extends State<LoginPage> {
                     textDirection: TextDirection.ltr,
                     decoration: const InputDecoration(
                       hintText: 'example@email.com',
-                      prefixIcon: Icon(Icons.email_outlined,
-                          color: AppColors.textHint),
+                      prefixIcon:
+                          Icon(Icons.email_outlined, color: AppColors.textHint),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'من فضلك أدخل البريد الإلكتروني';
+                        return AppStrings.enterEmail;
                       }
                       if (!value.contains('@')) {
-                        return 'البريد الإلكتروني غير صحيح';
+                        return AppStrings.invalidEmail;
                       }
                       return null;
                     },
@@ -128,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 20),
 
                   // Password
-                  Text('كلمة المرور', style: AppTextStyles.label),
+                  Text(AppStrings.password, style: AppTextStyles.label),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _passwordController,
@@ -154,10 +155,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'من فضلك أدخل كلمة المرور';
+                        return AppStrings.enterPassword;
                       }
                       if (value.length < 6) {
-                        return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                        return AppStrings.shortPassword;
                       }
                       return null;
                     },
@@ -168,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       return PrimaryButton(
-                        label: 'تسجيل الدخول',
+                        label: AppStrings.loginTitle,
                         isLoading: state is AuthLoading,
                         onPressed: _onLogin,
                       );
@@ -181,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'ليس لديك حساب؟',
+                        AppStrings.noAccount,
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.textSecondary,
                         ),
@@ -190,9 +191,9 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () {
                           Navigator.pushNamed(context, '/register');
                         },
-                        child: const Text(
-                          'إنشاء حساب',
-                          style: TextStyle(
+                        child: Text(
+                          AppStrings.createAccount,
+                          style: const TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                           ),

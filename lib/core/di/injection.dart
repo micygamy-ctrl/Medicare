@@ -5,10 +5,15 @@ import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/intake_log_repository_impl.dart';
 import '../../data/repositories/medication_repository_impl.dart';
 import '../../data/repositories/pairing_repository_impl.dart';
+import '../../data/repositories/lab_report_repository_impl.dart';
+import '../../data/repositories/vitals_repository_impl.dart';
 import '../../domain/repositories/i_auth_repository.dart';
 import '../../domain/repositories/i_intake_log_repository.dart';
+import '../../domain/repositories/i_lab_report_repository.dart';
 import '../../domain/repositories/i_medication_repository.dart';
 import '../../domain/repositories/i_pairing_repository.dart';
+import '../../domain/repositories/i_vitals_repository.dart';
+import '../services/ai_lab_analysis_service.dart';
 
 final getIt = GetIt.instance;
 
@@ -49,6 +54,26 @@ Future<void> setupDependencies() async {
 
   getIt.registerLazySingleton<IIntakeLogRepository>(
     () => IntakeLogRepositoryImpl(
+      firestore: getIt<FirebaseFirestore>(),
+    ),
+  );
+
+  // Services
+  getIt.registerLazySingleton<AILabAnalysisService>(
+    () => AILabAnalysisService(),
+  );
+
+  // Lab Report Repository
+  getIt.registerLazySingleton<ILabReportRepository>(
+    () => LabReportRepositoryImpl(
+      firestore: getIt<FirebaseFirestore>(),
+      aiService: getIt<AILabAnalysisService>(),
+    ),
+  );
+
+  // Vitals Repository
+  getIt.registerLazySingleton<IVitalsRepository>(
+    () => VitalsRepositoryImpl(
       firestore: getIt<FirebaseFirestore>(),
     ),
   );

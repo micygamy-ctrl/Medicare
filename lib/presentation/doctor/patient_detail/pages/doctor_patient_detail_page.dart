@@ -1,7 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../domain/entities/user.dart';
+import '../../../../domain/repositories/i_lab_report_repository.dart';
+import '../../../../domain/repositories/i_vitals_repository.dart';
+import '../../../patient/lab_reports/cubit/lab_report_cubit.dart';
+import '../../../patient/lab_reports/pages/lab_reports_list_page.dart';
+import '../../../patient/vitals/cubit/vitals_cubit.dart';
+import '../../../patient/vitals/pages/vitals_dashboard_page.dart';
 
 class DoctorPatientDetailPage extends StatelessWidget {
   final String patientId;
@@ -185,6 +193,135 @@ class DoctorPatientDetailPage extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 20),
+
+                // Lab Reports Section Card for Doctor
+                _buildSectionCard(
+                  title: 'تحاليل المريض الطبية ومؤشرات الذكاء الاصطناعي',
+                  icon: Icons.document_scanner_rounded,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'تقارير التحاليل واستخراج الـ OCR التلقائي',
+                              style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'استعراض قيم الجلوكوز والهيموجلوبين ووظائف الكبد والكلى',
+                              style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 12,
+                                  color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        icon: const Icon(Icons.analytics_rounded, size: 18, color: Colors.white),
+                        label: const Text(
+                          'استعراض',
+                          style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 12,
+                              color: Colors.white),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => BlocProvider(
+                                create: (_) => LabReportCubit(
+                                  getIt<ILabReportRepository>(),
+                                ),
+                                child: LabReportsListPage(
+                                  patientId: patientId,
+                                  chronicConditions: chronicDiseases,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Doctor Vitals Live Tracking Card
+                _buildSectionCard(
+                  title: 'المؤشرات الحيوية المباشرة (الضغط والنبض والأكسجين)',
+                  icon: Icons.monitor_heart_rounded,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'سجل القراءات الحية من الساعة الذكية والحساسات',
+                              style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'متابعة انضباط ضغط الدم ومعدل النبضات اليومي',
+                              style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 12,
+                                  color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        icon: const Icon(Icons.favorite_rounded, size: 18, color: Colors.white),
+                        label: const Text(
+                          'مراقبة',
+                          style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 12,
+                              color: Colors.white),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => BlocProvider(
+                                create: (_) => VitalsCubit(
+                                  getIt<IVitalsRepository>(),
+                                ),
+                                child: VitalsDashboardPage(
+                                  patientId: patientId,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
 
                 // Emergency Contact Card
                 _buildSectionCard(

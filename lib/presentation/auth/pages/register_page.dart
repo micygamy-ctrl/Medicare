@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../shared/widgets/medical_disclaimer_dialog.dart';
 import '../../shared/widgets/primary_button.dart';
 import '../cubit/auth_cubit.dart';
@@ -22,7 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _confirmPasswordController = TextEditingController();
   final _specializationController = TextEditingController();
   final _licenseController = TextEditingController();
-  
+
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _acceptedDisclaimer = false;
@@ -42,8 +43,8 @@ class _RegisterPageState extends State<RegisterPage> {
   void _onRegister() {
     if (!_acceptedDisclaimer) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('يرجى الموافقة على إخلاء المسؤولية الطبي أولاً'),
+        SnackBar(
+          content: Text(AppStrings.acceptDisclaimerFirst),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
@@ -98,8 +99,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 // Header
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 32, horizontal: 24),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
                   decoration: const BoxDecoration(
                     color: AppColors.primary,
                     borderRadius: BorderRadius.only(
@@ -119,9 +120,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'إنشاء حساب جديد',
-                        style: TextStyle(
+                      Text(
+                        AppStrings.registerTitle,
+                        style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
@@ -130,7 +131,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'انضم إلى Med Care اليوم',
+                        AppStrings.registerSubtitle,
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 14,
@@ -152,7 +153,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 8),
 
                         // Role Selection
-                        Text('أنا...', style: AppTextStyles.h3),
+                        Text(AppStrings.roleSelect, style: AppTextStyles.h3),
                         const SizedBox(height: 12),
                         Column(
                           children: [
@@ -160,20 +161,22 @@ class _RegisterPageState extends State<RegisterPage> {
                               children: [
                                 Expanded(
                                   child: _RoleCard(
-                                    title: 'مريض',
-                                    subtitle: 'أتابع أدويتي',
+                                    title: AppStrings.rolePatient,
+                                    subtitle: AppStrings.pick(
+                                        'أتابع أدويتي', 'Track my medications'),
                                     icon: Icons.person_outline_rounded,
                                     isSelected:
                                         _selectedRole == UserRole.patient,
-                                    onTap: () => setState(() =>
-                                        _selectedRole = UserRole.patient),
+                                    onTap: () => setState(
+                                        () => _selectedRole = UserRole.patient),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: _RoleCard(
-                                    title: 'مقدم رعاية',
-                                    subtitle: 'أتابع مريضاً',
+                                    title: AppStrings.roleCaregiver,
+                                    subtitle: AppStrings.pick(
+                                        'أتابع مريضًا', 'Care for a patient'),
                                     icon: Icons.favorite_outline_rounded,
                                     isSelected:
                                         _selectedRole == UserRole.caregiver,
@@ -185,8 +188,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             const SizedBox(height: 12),
                             _RoleCard(
-                              title: 'طبيب معالج',
-                              subtitle: 'متابعة المرضى وتحديث الروشتات الطبية',
+                              title: AppStrings.roleDoctor,
+                              subtitle: AppStrings.pick(
+                                'متابعة المرضى وتحديث الروشتات الطبية',
+                                'Follow patients and update treatment plans',
+                              ),
                               icon: Icons.medical_information_outlined,
                               isSelected: _selectedRole == UserRole.doctor,
                               onTap: () => setState(
@@ -197,7 +203,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 24),
 
                         // Name
-                        Text('الاسم الكامل', style: AppTextStyles.label),
+                        Text(AppStrings.fullName, style: AppTextStyles.label),
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _nameController,
@@ -208,10 +214,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'من فضلك أدخل اسمك';
+                              return AppStrings.enterName;
                             }
                             if (value.length < 3) {
-                              return 'الاسم يجب أن يكون 3 أحرف على الأقل';
+                              return AppStrings.shortName;
                             }
                             return null;
                           },
@@ -219,8 +225,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 16),
 
                         // Email
-                        Text('البريد الإلكتروني',
-                            style: AppTextStyles.label),
+                        Text(AppStrings.email, style: AppTextStyles.label),
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _emailController,
@@ -233,10 +238,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'من فضلك أدخل البريد الإلكتروني';
+                              return AppStrings.enterEmail;
                             }
                             if (!value.contains('@')) {
-                              return 'البريد الإلكتروني غير صحيح';
+                              return AppStrings.invalidEmail;
                             }
                             return null;
                           },
@@ -263,7 +268,6 @@ class _RegisterPageState extends State<RegisterPage> {
                             },
                           ),
                           const SizedBox(height: 16),
-
                           Text('رقم الترخيص الطبي / النقابي',
                               style: AppTextStyles.label),
                           const SizedBox(height: 8),
@@ -287,7 +291,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ],
 
                         // Password
-                        Text('كلمة المرور', style: AppTextStyles.label),
+                        Text(AppStrings.password, style: AppTextStyles.label),
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _passwordController,
@@ -304,16 +308,16 @@ class _RegisterPageState extends State<RegisterPage> {
                                     : Icons.visibility_off_outlined,
                                 color: AppColors.textHint,
                               ),
-                              onPressed: () => setState(() =>
-                                  _obscurePassword = !_obscurePassword),
+                              onPressed: () => setState(
+                                  () => _obscurePassword = !_obscurePassword),
                             ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'من فضلك أدخل كلمة المرور';
+                              return AppStrings.enterPassword;
                             }
                             if (value.length < 6) {
-                              return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                              return AppStrings.shortPassword;
                             }
                             return null;
                           },
@@ -321,7 +325,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 16),
 
                         // Confirm Password
-                        Text('تأكيد كلمة المرور',
+                        Text(AppStrings.confirmPassword,
                             style: AppTextStyles.label),
                         const SizedBox(height: 8),
                         TextFormField(
@@ -339,16 +343,16 @@ class _RegisterPageState extends State<RegisterPage> {
                                     : Icons.visibility_off_outlined,
                                 color: AppColors.textHint,
                               ),
-                              onPressed: () => setState(() =>
-                                  _obscureConfirm = !_obscureConfirm),
+                              onPressed: () => setState(
+                                  () => _obscureConfirm = !_obscureConfirm),
                             ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'من فضلك أكد كلمة المرور';
+                              return AppStrings.passwordsDoNotMatch;
                             }
                             if (value != _passwordController.text) {
-                              return 'كلمة المرور غير متطابقة';
+                              return AppStrings.passwordsDoNotMatch;
                             }
                             return null;
                           },
@@ -379,8 +383,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                             isMandatory: false)
                                         .then((accepted) {
                                       if (accepted == true) {
-                                        setState(() =>
-                                            _acceptedDisclaimer = true);
+                                        setState(
+                                            () => _acceptedDisclaimer = true);
                                       }
                                     });
                                   },
@@ -416,7 +420,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         BlocBuilder<AuthCubit, AuthState>(
                           builder: (context, state) {
                             return PrimaryButton(
-                              label: 'إنشاء الحساب',
+                              label: AppStrings.createAccount,
                               isLoading: state is AuthLoading,
                               onPressed: _onRegister,
                             );
@@ -429,16 +433,16 @@ class _RegisterPageState extends State<RegisterPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'لديك حساب بالفعل؟',
+                              AppStrings.haveAccount,
                               style: AppTextStyles.bodyMedium.copyWith(
                                 color: AppColors.textSecondary,
                               ),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: const Text(
-                                'تسجيل الدخول',
-                                style: TextStyle(
+                              child: Text(
+                                AppStrings.loginTitle,
+                                style: const TextStyle(
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.w600,
                                   fontFamily: 'Cairo',
@@ -506,9 +510,7 @@ class _RoleCard extends StatelessWidget {
               child: Icon(
                 icon,
                 size: 24,
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textSecondary,
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
               ),
             ),
             const SizedBox(width: 12),

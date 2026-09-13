@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../domain/entities/medication.dart';
@@ -39,15 +40,29 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
   final List<String> _units = ['mg', 'ml', 'g', 'IU', 'قرص', 'كبسولة'];
 
   final List<Map<String, String>> _boxColors = [
-    {'name': 'أحمر', 'hex': 'E53935'},
-    {'name': 'أزرق', 'hex': '1E88E5'},
-    {'name': 'أخضر', 'hex': '4CAF50'},
-    {'name': 'أصفر', 'hex': 'FDD835'},
-    {'name': 'برتقالي', 'hex': 'FB8C00'},
-    {'name': 'بنفسجي', 'hex': '8E24AA'},
-    {'name': 'سماوي', 'hex': '00ACC1'},
-    {'name': 'بني', 'hex': '6D4C41'},
+    {'nameKey': 'red',    'hex': 'E53935'},
+    {'nameKey': 'blue',   'hex': '1E88E5'},
+    {'nameKey': 'green',  'hex': '4CAF50'},
+    {'nameKey': 'yellow', 'hex': 'FDD835'},
+    {'nameKey': 'orange', 'hex': 'FB8C00'},
+    {'nameKey': 'purple', 'hex': '8E24AA'},
+    {'nameKey': 'cyan',   'hex': '00ACC1'},
+    {'nameKey': 'brown',  'hex': '6D4C41'},
   ];
+
+  String _colorName(String key) {
+    switch (key) {
+      case 'red':    return AppStrings.colorRed;
+      case 'blue':   return AppStrings.colorBlue;
+      case 'green':  return AppStrings.colorGreen;
+      case 'yellow': return AppStrings.colorYellow;
+      case 'orange': return AppStrings.colorOrange;
+      case 'purple': return AppStrings.colorPurple;
+      case 'cyan':   return AppStrings.colorCyan;
+      case 'brown':  return AppStrings.colorBrown;
+      default:       return key;
+    }
+  }
 
   @override
   void initState() {
@@ -68,7 +83,6 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
     _boxImagePath = widget.medication.boxImageUrl;
     _selectedColorHex = widget.medication.boxColorHex ?? 'E53935';
 
-    // تحويل الأوقات
     _selectedTimes = widget.medication.schedules.isNotEmpty
         ? widget.medication.schedules.first.times.map((t) {
             final parts = t.split(':');
@@ -101,8 +115,8 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تعذر التقاط/اختيار الصورة'),
+        SnackBar(
+          content: Text(AppStrings.drugBoxPickError),
           backgroundColor: AppColors.error,
         ),
       );
@@ -170,8 +184,8 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
       listener: (context, state) {
         if (state is MedicationUpdated) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم تحديث الدواء بنجاح ✓'),
+            SnackBar(
+              content: Text(AppStrings.medicationUpdated),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
             ),
@@ -190,7 +204,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
       },
       child: Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('تعديل الدواء')),
+        appBar: AppBar(title: Text(AppStrings.editMedication)),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Form(
@@ -199,7 +213,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Visual Box Image Picker
-                Text('صورة علبة الدواء', style: AppTextStyles.label),
+                Text(AppStrings.drugBoxPhotoLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () {
@@ -214,9 +228,9 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text(
-                              'تعديل صورة علبة الدواء',
-                              style: TextStyle(
+                            Text(
+                              AppStrings.drugBoxPickSheet,
+                              style: const TextStyle(
                                   fontFamily: 'Cairo',
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
@@ -225,8 +239,8 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                             ListTile(
                               leading: const Icon(Icons.camera_alt_rounded,
                                   color: AppColors.primary),
-                              title: const Text('الكاميرا المباشرة',
-                                  style: TextStyle(fontFamily: 'Cairo')),
+                              title: Text(AppStrings.drugBoxCamera,
+                                  style: const TextStyle(fontFamily: 'Cairo')),
                               onTap: () {
                                 Navigator.pop(context);
                                 _pickBoxImage(ImageSource.camera);
@@ -235,8 +249,8 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                             ListTile(
                               leading: const Icon(Icons.photo_library_rounded,
                                   color: AppColors.primary),
-                              title: const Text('معرض الصور',
-                                  style: TextStyle(fontFamily: 'Cairo')),
+                              title: Text(AppStrings.drugBoxGallery,
+                                  style: const TextStyle(fontFamily: 'Cairo')),
                               onTap: () {
                                 Navigator.pop(context);
                                 _pickBoxImage(ImageSource.gallery);
@@ -295,15 +309,15 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                               ],
                             ),
                           )
-                        : const Column(
+                        : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.add_a_photo_rounded,
+                              const Icon(Icons.add_a_photo_rounded,
                                   size: 36, color: AppColors.textHint),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
-                                'اضغط لتغيير صورة علبة الدواء',
-                                style: TextStyle(
+                                AppStrings.drugBoxPickPrompt,
+                                style: const TextStyle(
                                     fontFamily: 'Cairo',
                                     fontSize: 13,
                                     color: AppColors.textSecondary),
@@ -315,7 +329,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                 const SizedBox(height: 20),
 
                 // Color Swatch Selector
-                Text('لون علبة / شريط الدواء', style: AppTextStyles.label),
+                Text(AppStrings.drugBoxColorLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 SizedBox(
                   height: 50,
@@ -329,26 +343,30 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                       final isSelected = _selectedColorHex == colorHex;
                       final color = Color(int.parse('0xFF$colorHex'));
 
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedColorHex = colorHex),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected
-                                  ? Colors.black
-                                  : Colors.transparent,
-                              width: isSelected ? 3 : 0,
+                      return Tooltip(
+                        message: _colorName(item['nameKey']!),
+                        child: GestureDetector(
+                          onTap: () =>
+                              setState(() => _selectedColorHex = colorHex),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 46,
+                            height: 46,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? Colors.black
+                                    : Colors.transparent,
+                                width: isSelected ? 3 : 0,
+                              ),
                             ),
+                            child: isSelected
+                                ? const Icon(Icons.check_rounded,
+                                    color: Colors.white, size: 24)
+                                : null,
                           ),
-                          child: isSelected
-                              ? const Icon(Icons.check_rounded,
-                                  color: Colors.white, size: 24)
-                              : null,
                         ),
                       );
                     },
@@ -356,8 +374,8 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                 ),
                 const SizedBox(height: 24),
 
-                // اسم الدواء إنجليزي
-                Text('اسم الدواء (إنجليزي)', style: AppTextStyles.label),
+                // Drug name (English)
+                Text(AppStrings.medNameEn, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _nameController,
@@ -368,12 +386,12 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                         color: AppColors.textHint),
                   ),
                   validator: (value) =>
-                      value?.isEmpty == true ? 'من فضلك أدخل اسم الدواء' : null,
+                      value?.isEmpty == true ? AppStrings.enterMedName : null,
                 ),
                 const SizedBox(height: 16),
 
-                // اسم الدواء عربي
-                Text('اسم الدواء (عربي)', style: AppTextStyles.label),
+                // Drug name (Arabic)
+                Text(AppStrings.medNameAr, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _nameArController,
@@ -384,8 +402,8 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // الجرعة والوحدة
-                Text('الجرعة', style: AppTextStyles.label),
+                // Dosage + unit
+                Text(AppStrings.dosageLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -397,7 +415,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                         textDirection: TextDirection.ltr,
                         decoration: const InputDecoration(hintText: '500'),
                         validator: (value) =>
-                            value?.isEmpty == true ? 'أدخل الجرعة' : null,
+                            value?.isEmpty == true ? AppStrings.enterDosage : null,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -406,8 +424,8 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                         value: _selectedUnit,
                         decoration: const InputDecoration(),
                         items: _units
-                            .map((u) => DropdownMenuItem(
-                                value: u, child: Text(u)))
+                            .map((u) =>
+                                DropdownMenuItem(value: u, child: Text(u)))
                             .toList(),
                         onChanged: (v) => setState(() => _selectedUnit = v!),
                       ),
@@ -416,8 +434,8 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // شكل الدواء
-                Text('شكل الدواء', style: AppTextStyles.label),
+                // Drug form
+                Text(AppStrings.formLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 _FormSelector(
                   selected: _selectedForm,
@@ -425,26 +443,26 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // تعليمات
-                Text('تعليمات', style: AppTextStyles.label),
+                // Instructions
+                Text(AppStrings.instructionsLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _instructionsController,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    hintText: 'مثال: تناول مع الطعام',
+                  decoration: InputDecoration(
+                    hintText: AppStrings.instructionsHint,
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // تاريخ البداية
-                Text('تاريخ البداية', style: AppTextStyles.label),
+                // Start date
+                Text(AppStrings.startDateLabel, style: AppTextStyles.label),
                 const SizedBox(height: 8),
                 GestureDetector(
                   onTap: _pickStartDate,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(12),
@@ -465,16 +483,16 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // مواعيد الجرعات
+                // Dose times
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('مواعيد الجرعات', style: AppTextStyles.label),
+                    Text(AppStrings.doseTimesLabel, style: AppTextStyles.label),
                     TextButton.icon(
                       onPressed: () => setState(() => _selectedTimes
                           .add(const TimeOfDay(hour: 12, minute: 0))),
                       icon: const Icon(Icons.add, size: 18),
-                      label: const Text('إضافة موعد'),
+                      label: Text(AppStrings.addDoseTime),
                     ),
                   ],
                 ),
@@ -519,7 +537,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                 BlocBuilder<MedicationCubit, MedicationState>(
                   builder: (context, state) {
                     return PrimaryButton(
-                      label: 'حفظ التعديلات',
+                      label: AppStrings.save,
                       isLoading: state is MedicationLoading,
                       onPressed: _onSave,
                     );
@@ -548,12 +566,12 @@ class _FormSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final forms = [
-      (MedicationForm.tablet, Icons.medication_rounded, 'قرص'),
-      (MedicationForm.capsule, Icons.medication_outlined, 'كبسولة'),
-      (MedicationForm.syrup, Icons.local_drink_outlined, 'شراب'),
-      (MedicationForm.injection, Icons.vaccines_outlined, 'حقنة'),
-      (MedicationForm.drops, Icons.water_drop_outlined, 'قطرة'),
-      (MedicationForm.cream, Icons.sanitizer_outlined, 'كريم'),
+      (MedicationForm.tablet,    Icons.medication_rounded,    AppStrings.formTablet),
+      (MedicationForm.capsule,   Icons.medication_outlined,   AppStrings.formCapsule),
+      (MedicationForm.syrup,     Icons.local_drink_outlined,  AppStrings.formSyrup),
+      (MedicationForm.injection, Icons.vaccines_outlined,     AppStrings.formInjection),
+      (MedicationForm.drops,     Icons.water_drop_outlined,   AppStrings.formDrops),
+      (MedicationForm.cream,     Icons.sanitizer_outlined,    AppStrings.formCream),
     ];
 
     return Wrap(
@@ -586,8 +604,7 @@ class _FormSelector extends StatelessWidget {
                 Text(
                   item.$3,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color:
-                        isSelected ? AppColors.primary : AppColors.textPrimary,
+                    color: isSelected ? AppColors.primary : AppColors.textPrimary,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.w400,
                   ),
