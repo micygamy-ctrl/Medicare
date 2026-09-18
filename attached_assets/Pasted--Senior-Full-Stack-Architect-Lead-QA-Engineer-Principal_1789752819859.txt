@@ -1,0 +1,30 @@
+قم بالعمل كـ Senior Full-Stack Architect و Lead QA Engineer و Principal UI/UX Designer. أطلب منك إجراء مراجعة وفحص شامل ودقيق للغاية لكامل الكود المصدري (Codebase) الخاص بالمشروع في هذا الـ Workspace.
+
+قم بفحص كل ملف داخل المشروع (Frontend, Backend, Database Schemas, API Routes, Environment Variables, Navigation, State Management)، وقدم لي تقريراً تفصيلياً وعملياً مقسماً إلى المحاور التالية:
+
+1. 🚨 الأخطاء الحرجة والمشاكل (Critical Errors & Bugs)
+- استخرج جميع الأخطاء البرمجية (Syntax Errors)، المكونات المفقودة (Missing Imports)، والاستثناءات غير المعالجة (Unhandled Exceptions).
+- حدد أي وظائف (Functions) غير مكتملة، أو منطق برمدي مكسور، أو ثغرات تؤدي لسقوط التطبيق أثناء التشغيل (Runtime Errors).
+
+2. 🔗 التنقل والربط وتدفق البيانات (Navigation, Routing & Data Flow)
+- تحقق من ربط جميع الصفحات والمسارات (Routes) ببعضها بشكل صحيح.
+- حدد الأزرار أو العناصر غير المربوطة، المسارات الميتة (Dead Ends)، والصفحات المعزولة (Orphaned Routes).
+- افحص إدارة الحالة (State Management) وتمرير البيانات بين الصفحات لضمان عدم فقدان أو تشويه البيانات.
+
+3. 🎨 واجهة وتجربة المستخدم (UI/UX & Frontend Audit)
+- قم بتقييم الاتساق البصري، تجاوب التصميم (Responsiveness)، وهيكلة المكونات.
+- حدد الصفحات المفقودة، حالات التحميل (Loading States)، حالات الخالي (Empty States)، رسائل الأخطاء (Toast/Alerts)، والعناصر المؤقتة غير المنسقة.
+
+4. ⚙️ الخلفية البرمجية والـ APIs (Backend & Integration)
+- راجع جميع نقاط الاتصال (REST / GraphQL APIs): حدد أي endpoints مفقودة أو غير مكتملة أو ترجع بيانات وهمية (Mock Data).
+- افحص التحقق من البيانات (Data Validation)، رموز الاستجابة (HTTP Status Codes)، ومعالجة الأخطاء (Error Handling Middleware).
+- تحقق من الاستخدام الآمن لمتغيرات البيئة (Environment Variables).
+
+5. 🗄️ قاعدة البيانات والتصميم (Database & Schema Design)
+- افحص نماذج قاعدة البيانات (Schemas & Models) والعلاقات بين الجدول/المجموعات (Relationships & Foreign Keys).
+- حدد الحقول المفقودة، الاستعلامات غير الفعالة، أمليات CRUD المفقودة التي تتطلبها واجهة المستخدم.
+
+6. 📋 خطة التنفيذ الشاملة (Master Execution Plan)
+- قدم لي قائمة مهام مرتبة حسب الأولوية خطوة بخطوة (المرحلة 1: إصلاح الأخطاء -> المرحلة 2: إكمال Database & APIs -> المرحلة 3: ربط الصفحات والـ Routing -> المرحلة 4: تحسين الـ UI/UX) لتصبح النسخة جاهزة تماماً للإنتاج (Production-Ready) وبدون أي أخطاء.
+
+كن دقيقاً جداً: اذكر أسماء الملفات بالكامل، وأرقام الأسطر، وأسماء الـ Functions المعنية أينما أمكن. لا تعطيني ملخصاً عاماً بل تحليلاً تفصيلياً مع كيفية الإصلاح.
