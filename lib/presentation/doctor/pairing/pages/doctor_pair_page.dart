@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../domain/entities/user.dart';
 
@@ -40,8 +41,8 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
     final inputCode = _codeController.text.trim().toUpperCase();
     if (inputCode.length < 4) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('من فضلك أدخل كود المريض الصحيح'),
+        SnackBar(
+          content: Text(AppStrings.pairCodeInvalid),
           backgroundColor: AppColors.error,
         ),
       );
@@ -51,26 +52,62 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
     setState(() => _isLoading = true);
 
     try {
-      // Find patient with matching user ID prefix or pair code
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('role', isEqualTo: 'patient')
+      String? patientId;
+      String? patientName;
+
+      // 1. Direct lookup in pairingCodes collection
+      final codeDoc = await FirebaseFirestore.instance
+          .collection('pairingCodes')
+          .doc(inputCode)
           .get();
 
-      DocumentSnapshot? matchedPatientDoc;
-      for (final doc in querySnapshot.docs) {
-        if (doc.id.toUpperCase().startsWith(inputCode) ||
-            doc.id.toUpperCase() == inputCode) {
-          matchedPatientDoc = doc;
-          break;
+      if (codeDoc.exists) {
+        final codeData = codeDoc.data() as Map<String, dynamic>;
+        final expiresAt = (codeData['expiresAt'] as Timestamp?)?.toDate();
+        final isUsed = codeData['isUsed'] == true;
+
+        if (expiresAt != null && DateTime.now().isAfter(expiresAt)) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('انتهت صلاحية الكود'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          return;
+        }
+
+        if (isUsed) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('تم استخدام هذا الكود من قبل'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          return;
+        }
+
+        patientId = codeData['patientId'] as String?;
+      } else {
+        // 2. Direct lookup in users collection if full UID was provided
+        final directUserDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(inputCode)
+            .get();
+        if (directUserDoc.exists &&
+            directUserDoc.data()?['role'] == 'patient') {
+          patientId = directUserDoc.id;
         }
       }
 
-      if (matchedPatientDoc == null) {
+      if (patientId == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('لم يتم العثور على مريض بهذا الكود'),
+            SnackBar(
+              content: Text(AppStrings.pairCodeInvalid),
               backgroundColor: AppColors.error,
             ),
           );
@@ -78,14 +115,23 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
         return;
       }
 
-      final patientData = matchedPatientDoc.data() as Map<String, dynamic>;
-      final patientId = matchedPatientDoc.id;
-      final patientName = patientData['displayName'] ?? 'المريض';
+      // Fetch target patient name
+      final patientDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(patientId)
+          .get();
+      if (patientDoc.exists) {
+        patientName =
+            (patientDoc.data() as Map<String, dynamic>)['displayName'] ??
+                AppStrings.rolePatient;
+      } else {
+        patientName = AppStrings.rolePatient;
+      }
 
-      // Create pair document in Firestore
-      final pairRef = FirebaseFirestore.instance.collection('pairs').doc();
-      await pairRef.set({
-        'id': pairRef.id,
+      // Create pair document in Firestore securely
+      final pairId = '${widget.doctor.uid}_$patientId';
+      await FirebaseFirestore.instance.collection('pairs').doc(pairId).set({
+        'id': pairId,
         'doctorId': widget.doctor.uid,
         'doctorName': widget.doctor.displayName,
         'patientId': patientId,
@@ -94,10 +140,18 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
         'createdAt': Timestamp.now(),
       });
 
+      // Mark pairing code as used if valid
+      if (codeDoc.exists) {
+        await FirebaseFirestore.instance
+            .collection('pairingCodes')
+            .doc(inputCode)
+            .update({'isUsed': true});
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('تم ربط المريض ($patientName) بنجاح!'),
+            content: Text('${AppStrings.pairSuccess} ($patientName)'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -106,8 +160,8 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('حدث خطأ أثناء عملية الربط، حاول مرة أخرى'),
+          SnackBar(
+            content: Text(AppStrings.unknownError),
             backgroundColor: AppColors.error,
           ),
         );
@@ -122,9 +176,9 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
-          'ربط مريض جديد',
-          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+        title: Text(
+          AppStrings.doctorPairTitle,
+          style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -156,9 +210,9 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
                     color: AppColors.primary,
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'كود الطبيب الخاص بك',
-                    style: TextStyle(
+                  Text(
+                    AppStrings.doctorCodeTitle,
+                    style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -166,9 +220,9 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'شارك هذا الكود مع المريض ليقوم بإدخاله في تطبيقه وربط حسابه بك:',
-                    style: TextStyle(
+                  Text(
+                    AppStrings.doctorCodeSubtitle,
+                    style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 13,
                       color: AppColors.textSecondary,
@@ -206,9 +260,9 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
                             Clipboard.setData(
                                 ClipboardData(text: _generatedCode ?? ''));
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('تم نسخ كود الربط!'),
-                                duration: Duration(seconds: 2),
+                              SnackBar(
+                                content: Text(AppStrings.pairCodeCopied),
+                                duration: const Duration(seconds: 2),
                               ),
                             );
                           },
@@ -226,11 +280,11 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
             Row(
               children: [
                 Expanded(child: Divider(color: Colors.grey.shade300)),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
-                    'أو أدخل كود المريض المباشر',
-                    style: TextStyle(
+                    AppStrings.orEnterPatientCode,
+                    style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 13,
                       color: AppColors.textSecondary,
@@ -260,9 +314,9 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'إدخال كود المريض',
-                    style: TextStyle(
+                  Text(
+                    AppStrings.enterPatientCodeTitle,
+                    style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -274,7 +328,7 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
                     controller: _codeController,
                     textCapitalization: TextCapitalization.characters,
                     decoration: InputDecoration(
-                      hintText: 'أدخل أول 6 أحرف من كود المريض',
+                      hintText: AppStrings.enterPatientCodeHintText,
                       hintStyle: const TextStyle(fontFamily: 'Cairo'),
                       prefixIcon: const Icon(Icons.person_pin_rounded,
                           color: AppColors.textHint),
@@ -300,9 +354,9 @@ class _DoctorPairPageState extends State<DoctorPairPage> {
                       onPressed: _isLoading ? null : _linkPatientByCode,
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              'تأكيد ربط المريض',
-                              style: TextStyle(
+                          : Text(
+                              AppStrings.confirmPatientLink,
+                              style: const TextStyle(
                                 fontFamily: 'Cairo',
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

@@ -113,11 +113,9 @@ Future<void> addMedication({
       schedules: medication.schedules,
     );
     // جدولة الـ Alarm
-await AlarmService.scheduleAlarms(
-  medicationId: medication.id,
-  medicationName: medication.name,
-  schedules: medication.schedules,
-);
+    await AlarmService.scheduleAlarms(
+      medication: medication,
+    );
 
     emit(MedicationAdded());
   } on ServerFailure catch (e) {
@@ -140,11 +138,9 @@ Future<void> updateMedication(MedicationEntity medication) async {
       schedules: medication.schedules,
     );
     // إعادة جدولة الـ Alarm
-await AlarmService.scheduleAlarms(
-  medicationId: medication.id,
-  medicationName: medication.name,
-  schedules: medication.schedules,
-);
+    await AlarmService.scheduleAlarms(
+      medication: medication,
+    );
 
     emit(MedicationUpdated());
   } on ServerFailure catch (e) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../domain/entities/pair.dart';
@@ -32,7 +33,7 @@ class _PairCodePageState extends State<PairCodePage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('ربط مقدم الرعاية'),
+        title: Text(AppStrings.linkCaregiver),
         backgroundColor: AppColors.surface,
       ),
       body: BlocConsumer<PairingCubit, PairingState>(
@@ -47,8 +48,8 @@ class _PairCodePageState extends State<PairCodePage> {
           }
           if (state is PairingRevoked) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم إلغاء الارتباط بنجاح'),
+              SnackBar(
+                content: Text(AppStrings.revokePairSuccess),
                 backgroundColor: AppColors.success,
               ),
             );
@@ -113,14 +114,14 @@ class _InitialView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'ربط مقدم الرعاية',
+          Text(
+            AppStrings.linkCaregiver,
             style: AppTextStyles.h2,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           Text(
-            'ولّد كود مؤقت وشاركه مع مقدم الرعاية\nالكود صالح لمدة 24 ساعة',
+            AppStrings.generateCodeSubtitle,
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -132,7 +133,7 @@ class _InitialView extends StatelessWidget {
             height: 52,
             child: ElevatedButton(
               onPressed: onGenerate,
-              child: const Text('توليد الكود'),
+              child: Text(AppStrings.generateCode),
             ),
           ),
         ],
@@ -160,13 +161,14 @@ class _CodeGeneratedView extends StatelessWidget {
             color: AppColors.success,
           ),
           const SizedBox(height: 24),
-          const Text('كود الربط', style: AppTextStyles.h2),
+          Text(AppStrings.pairCodeTitle, style: AppTextStyles.h2),
           const SizedBox(height: 8),
           Text(
-            'شارك هذا الكود مع مقدم الرعاية',
+            AppStrings.pairCodeSubtitle,
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textSecondary,
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
 
@@ -175,8 +177,8 @@ class _CodeGeneratedView extends StatelessWidget {
             onTap: () {
               Clipboard.setData(ClipboardData(text: code));
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تم نسخ الكود'),
+                SnackBar(
+                  content: Text(AppStrings.pairCodeCopied),
                   backgroundColor: AppColors.success,
                 ),
               );
@@ -214,7 +216,7 @@ class _CodeGeneratedView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'اضغط على الكود لنسخه',
+            AppStrings.tapToCopyCode,
             style: AppTextStyles.caption,
           ),
           const SizedBox(height: 32),
@@ -235,7 +237,7 @@ class _CodeGeneratedView extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'الكود صالح لمدة 24 ساعة',
+                  AppStrings.codeValid24h,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.warning,
                   ),
@@ -280,7 +282,7 @@ class _AlreadyPairedView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text('مرتبط مع', style: AppTextStyles.h2),
+          Text(AppStrings.pairedWith, style: AppTextStyles.h2),
           const SizedBox(height: 8),
           Text(
             pair.caregiverName,
@@ -297,23 +299,21 @@ class _AlreadyPairedView extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text('إلغاء الارتباط'),
-                    content: const Text(
-                      'هل أنت متأكد من إلغاء الارتباط مع مقدم الرعاية؟',
-                    ),
+                    title: Text(AppStrings.revokePair),
+                    content: Text(AppStrings.revokePairConfirm),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx),
-                        child: const Text('إلغاء'),
+                        child: Text(AppStrings.cancel),
                       ),
                       TextButton(
                         onPressed: () {
                           Navigator.pop(ctx);
                           onRevoke();
                         },
-                        child: const Text(
-                          'تأكيد',
-                          style: TextStyle(color: AppColors.error),
+                        child: Text(
+                          AppStrings.confirm,
+                          style: const TextStyle(color: AppColors.error),
                         ),
                       ),
                     ],
@@ -324,7 +324,7 @@ class _AlreadyPairedView extends StatelessWidget {
                 side: const BorderSide(color: AppColors.error),
                 foregroundColor: AppColors.error,
               ),
-              child: const Text('إلغاء الارتباط'),
+              child: Text(AppStrings.revokePair),
             ),
           ),
         ],

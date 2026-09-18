@@ -75,10 +75,13 @@ Future<void> _checkAndSendReminders() async {
         final hour = int.parse(parts[0]);
         final minute = int.parse(parts[1]);
 
-        // تحقق لو الوقت حالياً (فرق أقل من 15 دقيقة)
+        // Handle midnight wrap-around (e.g. 23:59 vs 00:01)
         final scheduledMinutes = hour * 60 + minute;
         final currentMinutes = currentHour * 60 + currentMinute;
-        final diff = (scheduledMinutes - currentMinutes).abs();
+        int diff = (scheduledMinutes - currentMinutes).abs();
+        if (diff > 720) {
+          diff = 1440 - diff;
+        }
 
         if (diff <= 15) {
           // تحقق إن مفيش log موجود

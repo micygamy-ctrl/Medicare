@@ -1,9 +1,9 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../../domain/entities/medication.dart';
 
-// ده بيشتغل في الـ background
 @pragma('vm:entry-point')
 Future<void> alarmCallback(int id, Map<String, dynamic> params) async {
   final medicationName = params['medicationName'] as String? ?? 'الدواء';
@@ -13,20 +13,28 @@ Future<void> alarmCallback(int id, Map<String, dynamic> params) async {
 
   const androidSettings =
       AndroidInitializationSettings('@mipmap/ic_launcher');
+  const darwinSettings = DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
 
   await notifications.initialize(
-    const InitializationSettings(android: androidSettings),
+    const InitializationSettings(
+      android: androidSettings,
+      iOS: darwinSettings,
+    ),
   );
 
   await notifications.show(
     id,
-    '💊 وقت الدواء',
+    '💊 وقت تناول الدواء',
     'حان وقت تناول $medicationName — $time',
     NotificationDetails(
       android: AndroidNotificationDetails(
         'medication_alarm',
         'منبه الأدوية',
-        channelDescription: 'منبه لمواعيد الأدوية',
+        channelDescription: 'منبه لمواعيد التذكير بتناول الأدوية',
         importance: Importance.max,
         priority: Priority.max,
         icon: '@mipmap/ic_launcher',
@@ -54,36 +62,49 @@ Future<void> alarmCallback(int id, Map<String, dynamic> params) async {
           ),
         ],
       ),
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
     ),
   );
 }
 
 class AlarmService {
   static Future<void> initialize() async {
-    await AndroidAlarmManager.initialize();
+    if (Platform.isAndroid) {
+      await AndroidAlarmManager.initialize();
+    }
   }
 
-  // جدولة alarm لدواء معين
   static Future<void> scheduleAlarms({
-    required String medicationId,
-    required String medicationName,
-    required List<ScheduleEntity> schedules,
+    required MedicationEntity medication,
   }) async {
-    // إلغاء الـ alarms القديمة
-    await cancelAlarms(medicationId);
+    if (!medication.isActive || medication.isDeleted) return;
 
-    for (final schedule in schedules) {
+    final now = DateTime.now();
+
+    // 1. Verify endDate if present
+    if (medication.endDate != null && now.isAfter(medication.endDate!)) {
+      await cancelAlarms(medication.id);
+      return;
+    }
+
+    // Cancel previous alarms for this medication first
+    await cancelAlarms(medication.id);
+
+    int count = 0;
+    for (final schedule in medication.schedules) {
       for (int i = 0; i < schedule.times.length; i++) {
-        final time = schedule.times[i];
-        final parts = time.split(':');
+        final timeStr = schedule.times[i];
+        final parts = timeStr.split(':');
+        if (parts.length < 2) continue;
+
         final hour = int.parse(parts[0]);
         final minute = int.parse(parts[1]);
 
-        final alarmId =
-            '${medicationId}_$i'.hashCode.abs() % 2147483647;
-
-        final now = DateTime.now();
-        var alarmTime = DateTime(
+        var targetTime = DateTime(
           now.year,
           now.month,
           now.day,
@@ -91,58 +112,73 @@ class AlarmService {
           minute,
         );
 
-        // لو الوقت فات، جدوله بكره
-        if (alarmTime.isBefore(now)) {
-          alarmTime = alarmTime.add(const Duration(days: 1));
+        // Subtract reminderMinutesBefore offset if specified
+        if (schedule.reminderMinutesBefore > 0) {
+          targetTime = targetTime.subtract(
+            Duration(minutes: schedule.reminderMinutesBefore),
+          );
         }
 
-        await AndroidAlarmManager.periodic(
-          const Duration(days: 1),
-          alarmId,
-          alarmCallback,
-          startAt: alarmTime,
-          exact: true,
-          wakeup: true,
-          rescheduleOnReboot: true,
-          params: {
-            'medicationName': medicationName,
-            'medicationId': medicationId,
-            'time': time,
-          },
-        );
+        // If target time already passed today, advance to next day
+        if (targetTime.isBefore(now)) {
+          targetTime = targetTime.add(const Duration(days: 1));
+        }
 
-        print('✅ Alarm set for $medicationName at $time');
+        // Validate daysOfWeek filter if specified
+        if (schedule.daysOfWeek.isNotEmpty &&
+            !schedule.daysOfWeek.contains(targetTime.weekday)) {
+          // Find next matching weekday
+          int daysAdded = 0;
+          while (!schedule.daysOfWeek.contains(targetTime.weekday) &&
+              daysAdded < 7) {
+            targetTime = targetTime.add(const Duration(days: 1));
+            daysAdded++;
+          }
+        }
+
+        final alarmId = '${medication.id}_$count'.hashCode.abs() % 2147483647;
+
+        if (Platform.isAndroid) {
+          await AndroidAlarmManager.periodic(
+            const Duration(days: 1),
+            alarmId,
+            alarmCallback,
+            startAt: targetTime,
+            exact: true,
+            wakeup: true,
+            rescheduleOnReboot: true,
+            params: {
+              'medicationName': medication.name,
+              'medicationId': medication.id,
+              'time': timeStr,
+            },
+          );
+        }
+
+        count++;
       }
     }
   }
 
-  // إلغاء alarms دواء معين
   static Future<void> cancelAlarms(String medicationId) async {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 50; i++) {
       final id = '${medicationId}_$i'.hashCode.abs() % 2147483647;
-      await AndroidAlarmManager.cancel(id);
+      if (Platform.isAndroid) {
+        await AndroidAlarmManager.cancel(id);
+      }
     }
   }
 
-  // إلغاء كل الـ alarms
   static Future<void> cancelAll(List<MedicationEntity> medications) async {
     for (final medication in medications) {
       await cancelAlarms(medication.id);
     }
   }
 
-  // جدولة كل الأدوية
   static Future<void> scheduleAllMedications(
       List<MedicationEntity> medications) async {
     for (final medication in medications) {
-      if (medication.isActive && !medication.isDeleted) {
-        await scheduleAlarms(
-          medicationId: medication.id,
-          medicationName: medication.name,
-          schedules: medication.schedules,
-        );
-      }
+      await scheduleAlarms(medication: medication);
     }
-    print('✅ All alarms scheduled for ${medications.length} medications');
   }
 }

@@ -1,30 +1,42 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:medicare_app/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medicare_app/core/localization/app_language_cubit.dart';
+import 'package:medicare_app/core/localization/app_strings.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MediCareApp());
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  group('Localization & AppStrings Tests', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    test('AppStrings defaults to Arabic strings correctly', () {
+      AppStrings.setLanguage(AppLanguage.ar);
+      expect(AppStrings.isAr, true);
+      expect(AppStrings.appTitle, 'ميديكير');
+      expect(AppStrings.tabHome, 'الرئيسية');
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    test('AppStrings switches to English strings correctly', () {
+      AppStrings.setLanguage(AppLanguage.en);
+      expect(AppStrings.isAr, false);
+      expect(AppStrings.appTitle, 'MediCare');
+      expect(AppStrings.tabHome, 'Home');
+    });
+
+    test('AppLanguageCubit toggles language state', () async {
+      SharedPreferences.setMockInitialValues({'app_language': 'ar'});
+      final cubit = AppLanguageCubit();
+
+      expect(cubit.state.language, AppLanguage.ar);
+
+      await cubit.toggleLanguage();
+
+      expect(cubit.state.language, AppLanguage.en);
+      expect(AppStrings.appTitle, 'MediCare');
+
+      await cubit.close();
+    });
   });
 }

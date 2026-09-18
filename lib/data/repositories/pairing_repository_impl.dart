@@ -26,11 +26,10 @@ class PairingRepositoryImpl implements IPairingRepository {
   @override
   Future<String> generatePairingCode(String patientId) async {
     try {
-      // احذف الكود القديم لو موجود
+      // احذف الكود القديم لو موجود (استعلام بحقل واحد لتجنب احتياج Composite Index)
       final oldCodes = await _firestore
           .collection('pairingCodes')
           .where('patientId', isEqualTo: patientId)
-          .where('isUsed', isEqualTo: false)
           .get();
 
       for (final doc in oldCodes.docs) {
@@ -62,7 +61,11 @@ class PairingRepositoryImpl implements IPairingRepository {
 
       return code;
     } catch (e) {
-      throw const ServerFailure('فشل في توليد الكود');
+      assert(() {
+        print('Error in generatePairingCode: $e');
+        return true;
+      }());
+      throw ServerFailure('فشل في توليد الكود: ${e.toString()}');
     }
   }
 

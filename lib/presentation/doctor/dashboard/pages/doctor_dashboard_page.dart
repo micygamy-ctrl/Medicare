@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../domain/entities/user.dart';
 import '../../patient_detail/pages/doctor_patient_detail_page.dart';
@@ -35,7 +36,7 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'د. ${widget.doctor.displayName}',
+              '${AppStrings.isAr ? 'د.' : 'Dr.'} ${widget.doctor.displayName}',
               style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 18,
@@ -44,7 +45,7 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
               ),
             ),
             Text(
-              widget.doctor.specialization ?? 'لوحة متابعة المرضى',
+              widget.doctor.specialization ?? AppStrings.doctorPatientsPanel,
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 12,
@@ -56,7 +57,7 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white),
-            tooltip: 'ربط مريض جديد',
+            tooltip: AppStrings.tabDoctorPairing,
             onPressed: () {
               Navigator.push(
                 context,
@@ -95,7 +96,7 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
                     children: [
                       Expanded(
                         child: _buildSummaryCard(
-                          title: 'المرضى المسجلين',
+                          title: AppStrings.registeredPatients,
                           value: '$patientCount',
                           icon: Icons.people_outline_rounded,
                           color: Colors.white,
@@ -104,7 +105,7 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildSummaryCard(
-                          title: 'متوسط الالتزام',
+                          title: AppStrings.averageAdherence,
                           value: '88%',
                           icon: Icons.check_circle_outline_rounded,
                           color: Colors.white,
@@ -127,7 +128,7 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
                     controller: _searchController,
                     onChanged: (val) => setState(() => _searchQuery = val.trim()),
                     decoration: InputDecoration(
-                      hintText: 'ابحث باسم المريض...',
+                      hintText: AppStrings.searchPatientHint,
                       hintStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 14),
                       prefixIcon: const Icon(Icons.search_rounded,
                           color: AppColors.textHint),
@@ -144,9 +145,9 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'قائمة المرضى الخاضعين لمتابعتك',
-                        style: TextStyle(
+                      Text(
+                        AppStrings.myPatientsList,
+                        style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -155,9 +156,9 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
                       ),
                       TextButton.icon(
                         icon: const Icon(Icons.qr_code_rounded, size: 18),
-                        label: const Text(
-                          'ربط مريض',
-                          style: TextStyle(
+                        label: Text(
+                          AppStrings.linkNewPatient,
+                          style: const TextStyle(
                               fontFamily: 'Cairo', fontWeight: FontWeight.bold),
                         ),
                         onPressed: () {
@@ -207,7 +208,7 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
                         pairDocs[index].data() as Map<String, dynamic>;
                     final patientId = pairData['patientId'] as String? ?? '';
                     final patientName =
-                        pairData['patientName'] as String? ?? 'مريض بدون اسم';
+                        pairData['patientName'] as String? ?? AppStrings.unknownPatient;
 
                     if (_searchQuery.isNotEmpty &&
                         !patientName
@@ -284,7 +285,7 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
     return FutureBuilder<DocumentSnapshot>(
       future: FirebaseFirestore.instance.collection('users').doc(patientId).get(),
       builder: (context, snapshot) {
-        String subtitle = 'جاري التحميل...';
+        String subtitle = AppStrings.loading;
         String bloodTypeStr = '';
         List<String> chronicDiseases = [];
 
@@ -293,9 +294,9 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
           bloodTypeStr = data['bloodType'] ?? '';
           chronicDiseases = List<String>.from(data['chronicDiseases'] ?? []);
           if (chronicDiseases.isNotEmpty) {
-            subtitle = 'الأمراض: ${chronicDiseases.join('، ')}';
+            subtitle = AppStrings.chronicDiseasesLabel(chronicDiseases.join('، '));
           } else {
-            subtitle = 'لا توجد أمراض مزمنة مسجلة';
+            subtitle = AppStrings.noChronicDiseases;
           }
         }
 
@@ -376,31 +377,59 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: const LinearProgressIndicator(
-                          value: 0.90, // Sample adherence
-                          backgroundColor: AppColors.surfaceVariant,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(AppColors.success),
-                          minHeight: 6,
+                FutureBuilder<QuerySnapshot>(
+                  future: FirebaseFirestore.instance
+                      .collection('intakeLogs')
+                      .where('patientId', isEqualTo: patientId)
+                      .get(),
+                  builder: (context, logSnapshot) {
+                    double adherenceVal = 0.85; // Default if no logs
+                    int pctInt = 85;
+
+                    if (logSnapshot.hasData && logSnapshot.data!.docs.isNotEmpty) {
+                      final logs = logSnapshot.data!.docs;
+                      final takenCount = logs
+                          .where((doc) =>
+                              (doc.data() as Map<String, dynamic>)['status'] ==
+                              'taken')
+                          .length;
+                      adherenceVal = takenCount / logs.length;
+                      pctInt = (adherenceVal * 100).round();
+                    }
+
+                    final adhColor = adherenceVal >= 0.8
+                        ? AppColors.success
+                        : adherenceVal >= 0.5
+                            ? AppColors.warning
+                            : AppColors.error;
+
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: adherenceVal,
+                              backgroundColor: AppColors.surfaceVariant,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(adhColor),
+                              minHeight: 6,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      '90% التزام',
-                      style: TextStyle(
-                        fontFamily: 'Cairo',
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.success,
-                      ),
-                    ),
-                  ],
+                        const SizedBox(width: 8),
+                        Text(
+                          AppStrings.adherencePct(pctInt.toString()),
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: adhColor,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -435,9 +464,9 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
             color: AppColors.textHint,
           ),
           const SizedBox(height: 16),
-          const Text(
-            'لا يوجد مرضى خاضعين لمتابعتك حالياً',
-            style: TextStyle(
+          Text(
+            AppStrings.noDocPatients,
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -445,9 +474,9 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'يمكنك ربط المرضى بك بسهولة عن طريق مشاركة رمز الربط الخاص بك.',
-            style: TextStyle(
+          Text(
+            AppStrings.noDocPatientsHint,
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 13,
               color: AppColors.textSecondary,
@@ -463,9 +492,9 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
             icon: const Icon(Icons.qr_code_rounded, color: Colors.white),
-            label: const Text(
-              'إنشاء رمز ربط مريض',
-              style: TextStyle(
+            label: Text(
+              AppStrings.createLinkCode,
+              style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.bold,
                   color: Colors.white),

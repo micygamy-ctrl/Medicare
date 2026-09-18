@@ -377,6 +377,44 @@ class AppStrings {
   static String get pairSuccess =>
       pick('تم الربط بنجاح ✓', 'Paired successfully ✓');
   static String get pairButton => pick('ربط الآن', 'Link now');
+  static String get generateCode => pick('توليد الكود', 'Generate code');
+  static String get generateCodeSubtitle => pick(
+      'ولّد كود مؤقت وشاركه مع مقدم الرعاية\nالكود صالح لمدة 24 ساعة',
+      'Generate a temporary code and share it with your caregiver\nCode is valid for 24 hours');
+  static String get codeValid24h =>
+      pick('الكود صالح لمدة 24 ساعة', 'Code is valid for 24 hours');
+  static String get tapToCopyCode =>
+      pick('اضغط على الكود لنسخه', 'Tap code to copy');
+  static String get pairedWith => pick('مرتبط مع', 'Paired with');
+  static String get revokePair => pick('إلغاء الارتباط', 'Revoke link');
+  static String get revokePairConfirm => pick(
+      'هل أنت متأكد من إلغاء الارتباط مع مقدم الرعاية؟',
+      'Are you sure you want to revoke link with caregiver?');
+  static String get revokePairSuccess =>
+      pick('تم إلغاء الارتباط بنجاح', 'Link revoked successfully');
+  static String get enterPatientCodeSubtitle => pick(
+      'أدخل كود الربط المكون من 6 أرقام المصدر من تطبيق المريض',
+      'Enter the 6-digit pairing code generated from the patient app');
+  static String get linkWithPatient =>
+      pick('ربط حساب مريض', 'Link patient account');
+  static String get doctorPairTitle =>
+      pick('ربط مريض جديد', 'Link new patient');
+  static String get doctorPairSubtitle => pick(
+      'أدخل كود الربط الخاص بالمريض لإضافته لقائمة متابعتك',
+      'Enter patient pairing code to add them to your list');
+  static String get doctorCodeTitle =>
+      pick('كود الطبيب الخاص بك', 'Your doctor code');
+  static String get doctorCodeSubtitle => pick(
+      'شارك هذا الكود مع المريض ليقوم بإدخاله في تطبيقه وربط حسابه بك',
+      'Share this code with your patient to link accounts');
+  static String get orEnterPatientCode =>
+      pick('أو أدخل كود المريض المباشر', 'Or enter direct patient code');
+  static String get enterPatientCodeTitle =>
+      pick('إدخال كود المريض', 'Enter patient code');
+  static String get enterPatientCodeHintText =>
+      pick('أدخل كود المريض (6 أحرف)', 'Enter patient code (6 characters)');
+  static String get confirmPatientLink =>
+      pick('تأكيد ربط المريض', 'Confirm patient link');
 
   // ── Adherence / Analytics ────────────────────────────────────────────────
   static String get adherenceTitle =>

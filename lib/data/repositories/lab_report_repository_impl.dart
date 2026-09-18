@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 import '../../core/error/failures.dart';
 import '../../core/services/ai_lab_analysis_service.dart';
@@ -38,9 +39,19 @@ class LabReportRepositoryImpl implements ILabReportRepository {
         chronicConditions: patientChronicConditions,
       );
 
-      // In production, imageFile is uploaded to Firebase Storage or local app storage.
-      // Here we store path or reference URL:
-      final imageUrl = imageFile.path;
+      // Upload image to Firebase Storage if online, with local fallback
+      String imageUrl = imageFile.path;
+      try {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('lab_reports')
+            .child(patientId)
+            .child('$reportId.jpg');
+        await storageRef.putFile(imageFile);
+        imageUrl = await storageRef.getDownloadURL();
+      } catch (_) {
+        // Fallback to local path if offline or during testing
+      }
 
       final reportModel = LabReportModel(
         id: reportId,
