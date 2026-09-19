@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../domain/entities/lab_report.dart';
@@ -55,29 +57,51 @@ class LabReportError extends LabReportState {
 
 class LabReportCubit extends Cubit<LabReportState> {
   final ILabReportRepository _repository;
+  StreamSubscription? _reportsSubscription;
+  int _loadGeneration = 0;
 
   LabReportCubit(this._repository) : super(LabReportInitial());
 
-  void loadPatientReports({
+  Future<void> loadPatientReports({
     required String patientId,
     required List<String> chronicDiseases,
-  }) {
+  }) async {
+    final loadGeneration = ++_loadGeneration;
     emit(LabReportLoading());
-    _repository.getPatientLabReports(patientId).listen(
-      (reports) async {
-        try {
-          final recs = await _repository.getPersonalizedRecommendations(
-            patientId: patientId,
-            chronicDiseases: chronicDiseases,
-            recentLabReports: reports,
-          );
-          emit(LabReportLoaded(reports: reports, recommendations: recs));
-        } catch (e) {
-          emit(LabReportLoaded(reports: reports, recommendations: const []));
-        }
-      },
-      onError: (e) => emit(const LabReportError('فشل في تحميل التحاليل الطبية')),
-    );
+    await _reportsSubscription?.cancel();
+
+    try {
+      _reportsSubscription = _repository.getPatientLabReports(patientId).listen(
+        (reports) async {
+          try {
+            if (loadGeneration != _loadGeneration || isClosed) return;
+
+            final recs = await _repository.getPersonalizedRecommendations(
+              patientId: patientId,
+              chronicDiseases: chronicDiseases,
+              recentLabReports: reports,
+            );
+            if (loadGeneration == _loadGeneration && !isClosed) {
+              emit(LabReportLoaded(reports: reports, recommendations: recs));
+            }
+          } catch (e) {
+            if (loadGeneration == _loadGeneration && !isClosed) {
+              emit(const LabReportError(
+                  'فشل في تحميل التوصيات الطبية للتحليل'));
+            }
+          }
+        },
+        onError: (e) {
+          if (loadGeneration == _loadGeneration && !isClosed) {
+            emit(const LabReportError('فشل في تحميل التحاليل الطبية'));
+          }
+        },
+      );
+    } catch (e) {
+      if (loadGeneration == _loadGeneration && !isClosed) {
+        emit(const LabReportError('فشل في تحميل التحاليل الطبية'));
+      }
+    }
   }
 
   Future<void> uploadAndAnalyze({
@@ -109,5 +133,12 @@ class LabReportCubit extends Cubit<LabReportState> {
     } catch (e) {
       emit(const LabReportError('فشل في حذف التقرير'));
     }
+  }
+
+  @override
+  Future<void> close() async {
+    _loadGeneration++;
+    await _reportsSubscription?.cancel();
+    return super.close();
   }
 }

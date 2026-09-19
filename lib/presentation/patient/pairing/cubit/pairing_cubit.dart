@@ -79,8 +79,10 @@ class PairingCubit extends Cubit<PairingState> {
       } else {
         emit(PairingInitial());
       }
+    } on ServerFailure catch (e) {
+      emit(PairingError(e.message));
     } catch (e) {
-      emit(PairingInitial());
+      emit(const PairingError('فشل في تحميل حالة الارتباط'));
     }
   }
 

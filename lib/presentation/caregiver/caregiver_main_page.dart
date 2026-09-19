@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/di/injection.dart';
 import '../../core/localization/app_strings.dart';
+import '../../domain/repositories/i_pairing_repository.dart';
 import '../auth/cubit/auth_cubit.dart';
+import '../patient/pairing/cubit/pairing_cubit.dart';
 import 'dashboard/caregiver_dashboard_page.dart';
 import 'pairing/pages/enter_pair_code_page.dart';
 import 'profile/caregiver_profile_page.dart';
@@ -38,52 +41,56 @@ class _CaregiverMainPageState extends State<CaregiverMainPage> {
           CaregiverProfilePage(user: user),
         ];
 
-        return BlocListener<AuthCubit, AuthState>(
-          listener: (context, state) {
-            if (state is AuthUnauthenticated) {
-              Navigator.pushReplacementNamed(context, '/login');
-            }
-          },
-          child: Scaffold(
-            drawer: AppDrawer(
-              user: user,
-              selectedIndex: _currentIndex,
-              onSelectMainItem: (index) => setState(() => _currentIndex = index),
-            ),
-            body: IndexedStack(
-              index: _currentIndex,
-              children: pages,
-            ),
-            bottomNavigationBar: Container(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
+        return BlocProvider(
+          create: (_) => PairingCubit(getIt<IPairingRepository>()),
+          child: BlocListener<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if (state is AuthUnauthenticated) {
+                Navigator.pushReplacementNamed(context, '/login');
+              }
+            },
+            child: Scaffold(
+              drawer: AppDrawer(
+                user: user,
+                selectedIndex: _currentIndex,
+                onSelectMainItem: (index) =>
+                    setState(() => _currentIndex = index),
               ),
-              child: BottomNavigationBar(
-                currentIndex: _currentIndex,
-                onTap: (index) => setState(() => _currentIndex = index),
-                items: [
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.dashboard_outlined),
-                    activeIcon: const Icon(Icons.dashboard_rounded),
-                    label: AppStrings.menuDashboard,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.person_add_outlined),
-                    activeIcon: const Icon(Icons.person_add_rounded),
-                    label: AppStrings.tabPairPatient,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.person_outline_rounded),
-                    activeIcon: const Icon(Icons.person_rounded),
-                    label: AppStrings.tabProfile,
-                  ),
-                ],
+              body: IndexedStack(
+                index: _currentIndex,
+                children: pages,
+              ),
+              bottomNavigationBar: Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: BottomNavigationBar(
+                  currentIndex: _currentIndex,
+                  onTap: (index) => setState(() => _currentIndex = index),
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: const Icon(Icons.dashboard_outlined),
+                      activeIcon: const Icon(Icons.dashboard_rounded),
+                      label: AppStrings.menuDashboard,
+                    ),
+                    BottomNavigationBarItem(
+                      icon: const Icon(Icons.person_add_outlined),
+                      activeIcon: const Icon(Icons.person_add_rounded),
+                      label: AppStrings.tabPairPatient,
+                    ),
+                    BottomNavigationBarItem(
+                      icon: const Icon(Icons.person_outline_rounded),
+                      activeIcon: const Icon(Icons.person_rounded),
+                      label: AppStrings.tabProfile,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -127,7 +127,7 @@ class IntakeLogRepositoryImpl implements IIntakeLogRepository {
 
       return (takenCount / logs.length) * 100;
     } catch (e) {
-      return 0.0;
+      throw const ServerFailure('فشل في حساب نسبة الالتزام');
     }
   }
 

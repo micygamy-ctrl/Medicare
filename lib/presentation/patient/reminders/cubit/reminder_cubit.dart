@@ -34,7 +34,7 @@ class ReminderCubit extends Cubit<ReminderState> {
   final IMedicationRepository _medicationRepository;
 
   StreamSubscription? _logsSubscription;
-  bool _isInitialized = false;
+  int _loadGeneration = 0;
 
   ReminderCubit({
     required IIntakeLogRepository intakeLogRepository,
@@ -44,10 +44,7 @@ class ReminderCubit extends Cubit<ReminderState> {
         super(ReminderInitial());
 
   Future<void> loadTodayReminders(String patientId) async {
-    // منع التحميل المزدوج
-    if (_isInitialized) return;
-    _isInitialized = true;
-
+    final loadGeneration = ++_loadGeneration;
     emit(ReminderLoading());
 
     try {
@@ -57,28 +54,31 @@ class ReminderCubit extends Cubit<ReminderState> {
       // إنشاء الـ logs الناقصة
       await _createMissingLogs(patientId);
 
+      if (loadGeneration != _loadGeneration || isClosed) return;
+
       // الاستماع للـ stream
       _logsSubscription = _intakeLogRepository
           .getTodayLogs(patientId)
           .listen(
         (logs) {
-          if (!isClosed) emit(ReminderLoaded(logs));
+          if (loadGeneration == _loadGeneration && !isClosed) {
+            emit(ReminderLoaded(logs));
+          }
         },
         onError: (e) {
-          if (!isClosed) {
+          if (loadGeneration == _loadGeneration && !isClosed) {
             emit(const ReminderError('فشل في تحميل التذكيرات'));
           }
         },
       );
     } catch (e) {
-      if (!isClosed) {
+      if (loadGeneration == _loadGeneration && !isClosed) {
         emit(const ReminderError('فشل في تحميل التذكيرات'));
       }
     }
   }
 
   Future<void> _createMissingLogs(String patientId) async {
-    try {
       final medications = await _medicationRepository
           .getPatientMedications(patientId)
           .first;
@@ -120,9 +120,6 @@ class ReminderCubit extends Cubit<ReminderState> {
           }
         }
       }
-    } catch (e) {
-      print('Error creating missing logs: $e');
-    }
   }
 
   Future<void> markAsTaken(String logId) async {
@@ -149,12 +146,12 @@ class ReminderCubit extends Cubit<ReminderState> {
 
   // إعادة التحميل لو محتاج
   Future<void> refresh(String patientId) async {
-    _isInitialized = false;
     await loadTodayReminders(patientId);
   }
 
   @override
   Future<void> close() async {
+    _loadGeneration++;
     await _logsSubscription?.cancel();
     return super.close();
   }

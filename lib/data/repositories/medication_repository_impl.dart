@@ -21,21 +21,13 @@ Stream<List<MedicationEntity>> getPatientMedications(String patientId) {
       .orderBy('createdAt', descending: true)
       .snapshots()
       .asyncMap((snapshot) async {
-    try {
-      final medications = <MedicationEntity>[];
-      for (final doc in snapshot.docs) {
-        final schedules = await _getSchedules(doc.id);
-        medications.add(MedicationModel.fromFirestore(doc, schedules));
-      }
-      return medications;
-    } catch (e) {
-      print('Error loading medications: $e');
-      return <MedicationEntity>[];
-    }
-  }).handleError((error) {
-    print('Stream error: $error');
-    return <MedicationEntity>[];
-  });
+        final medications = <MedicationEntity>[];
+        for (final doc in snapshot.docs) {
+          final schedules = await _getSchedules(doc.id);
+          medications.add(MedicationModel.fromFirestore(doc, schedules));
+        }
+        return medications;
+      });
 }
 
   Future<List<ScheduleModel>> _getSchedules(String medicationId) async {

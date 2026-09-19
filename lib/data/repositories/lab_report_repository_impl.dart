@@ -80,8 +80,6 @@ class LabReportRepositoryImpl implements ILabReportRepository {
       return snapshot.docs
           .map((doc) => LabReportModel.fromFirestore(doc))
           .toList();
-    }).handleError((error) {
-      return <LabReportEntity>[];
     });
   }
 

@@ -152,7 +152,7 @@ class PairingRepositoryImpl implements IPairingRepository {
       if (query.docs.isEmpty) return null;
       return PairModel.fromFirestore(query.docs.first);
     } catch (e) {
-      return null;
+      throw const ServerFailure('فشل في تحميل حالة الارتباط');
     }
   }
 

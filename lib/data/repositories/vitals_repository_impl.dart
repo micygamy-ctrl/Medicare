@@ -95,8 +95,6 @@ class VitalsRepositoryImpl implements IVitalsRepository {
       return snapshot.docs
           .map((doc) => VitalSignModel.fromFirestore(doc))
           .toList();
-    }).handleError((error) {
-      return <VitalSignEntity>[];
     });
   }
 

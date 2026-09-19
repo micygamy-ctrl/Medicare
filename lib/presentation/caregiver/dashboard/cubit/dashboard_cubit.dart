@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../domain/entities/intake_log.dart';
@@ -64,6 +66,8 @@ class DashboardCubit extends Cubit<DashboardState> {
   final IPairingRepository _pairingRepository;
   final IMedicationRepository _medicationRepository;
   final IIntakeLogRepository _intakeLogRepository;
+  StreamSubscription? _patientsSubscription;
+  int _loadGeneration = 0;
 
   DashboardCubit({
     required IPairingRepository pairingRepository,
@@ -75,35 +79,50 @@ class DashboardCubit extends Cubit<DashboardState> {
         super(DashboardInitial());
 
   Future<void> loadDashboard(String caregiverId) async {
-  emit(DashboardLoading());
-  try {
-    _pairingRepository.getCaregiverPatients(caregiverId).listen(
-      (pairs) async {
-        if (pairs.isEmpty) {
-          emit(const DashboardLoaded([]));
-          return;
-        }
+    final loadGeneration = ++_loadGeneration;
+    emit(DashboardLoading());
+    await _patientsSubscription?.cancel();
 
-        // Parallel Reads — بدل Sequential
-        final summaries = await Future.wait(
-          pairs.map((pair) => _buildPatientSummary(pair)),
-        );
+    try {
+      _patientsSubscription = _pairingRepository
+          .getCaregiverPatients(caregiverId)
+          .listen(
+        (pairs) async {
+          try {
+            if (loadGeneration != _loadGeneration || isClosed) return;
 
-        emit(DashboardLoaded(
-          summaries.whereType<PatientSummary>().toList(),
-        ));
-      },
-      onError: (e) =>
-          emit(const DashboardError('فشل في تحميل البيانات')),
-    );
-  } catch (e) {
-    emit(const DashboardError('فشل في تحميل البيانات'));
+            if (pairs.isEmpty) {
+              emit(const DashboardLoaded([]));
+              return;
+            }
+
+            final summaries = await Future.wait(
+              pairs.map(_buildPatientSummary),
+            );
+
+            if (loadGeneration == _loadGeneration && !isClosed) {
+              emit(DashboardLoaded(summaries));
+            }
+          } catch (e) {
+            if (loadGeneration == _loadGeneration && !isClosed) {
+              emit(const DashboardError('فشل في تحميل بيانات المرضى'));
+            }
+          }
+        },
+        onError: (e) {
+          if (loadGeneration == _loadGeneration && !isClosed) {
+            emit(const DashboardError('فشل في تحميل البيانات'));
+          }
+        },
+      );
+    } catch (e) {
+      if (!isClosed) {
+        emit(const DashboardError('فشل في تحميل البيانات'));
+      }
+    }
   }
-}
 
-Future<PatientSummary?> _buildPatientSummary(PairEntity pair) async {
-  try {
-    // Parallel — كل الـ reads في نفس الوقت
+  Future<PatientSummary> _buildPatientSummary(PairEntity pair) async {
     final results = await Future.wait([
       _medicationRepository
           .getPatientMedications(pair.patientId)
@@ -123,14 +142,12 @@ Future<PatientSummary?> _buildPatientSummary(PairEntity pair) async {
       todayLogs: results[1] as List<IntakeLogEntity>,
       adherencePercentage: results[2] as double,
     );
-  } catch (e) {
-    // لو فيه error في مريض واحد، مش هيوقف الباقين
-    return PatientSummary(
-      pair: pair,
-      medications: const [],
-      todayLogs: const [],
-      adherencePercentage: 0,
-    );
   }
-}
+
+  @override
+  Future<void> close() async {
+    _loadGeneration++;
+    await _patientsSubscription?.cancel();
+    return super.close();
+  }
 }
