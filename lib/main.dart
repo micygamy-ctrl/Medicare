@@ -192,7 +192,11 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
     }
     case AppRoutes.addMedication: {
       final patientId = args?['patientId'];
+      final createdBy = args?['createdBy'];
       if (patientId is! String || patientId.isEmpty) {
+        return _unknownRoute(settings);
+      }
+      if (createdBy != null && createdBy is! String) {
         return _unknownRoute(settings);
       }
       return _pageRoute(
@@ -201,7 +205,7 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
           create: (_) => MedicationCubit(getIt<IMedicationRepository>()),
           child: AddMedicationPage(
             patientId: patientId,
-            createdBy: args?['createdBy'] as String? ?? '',
+            createdBy: createdBy as String? ?? '',
           ),
         ),
       );
@@ -295,6 +299,9 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
 Map<String, dynamic>? _routeArguments(RouteSettings settings) {
   final arguments = settings.arguments;
   if (arguments is Map) {
+    if (arguments.keys.any((key) => key is! String)) {
+      return null;
+    }
     return Map<String, dynamic>.from(arguments);
   }
   return null;
