@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'core/constants/app_routes.dart';
 import 'core/di/injection.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/notification_scheduler.dart';
 import 'domain/repositories/i_auth_repository.dart';
+import 'domain/repositories/i_intake_log_repository.dart';
 import 'domain/repositories/i_medication_repository.dart';
+import 'domain/repositories/i_pairing_repository.dart';
+import 'domain/entities/user.dart';
 import 'firebase_options.dart';
 import 'presentation/auth/cubit/auth_cubit.dart';
 import 'presentation/auth/pages/login_page.dart';
@@ -18,11 +22,17 @@ import 'presentation/auth/pages/splash_page.dart';
 import 'presentation/caregiver/caregiver_main_page.dart';
 import 'presentation/caregiver/pairing/pages/enter_pair_code_page.dart';
 import 'presentation/doctor/doctor_main_page.dart';
+import 'presentation/doctor/patient_detail/pages/doctor_patient_detail_page.dart';
 import 'presentation/patient/home/patient_main_page.dart';
 import 'presentation/patient/medications/cubit/medication_cubit.dart';
 import 'presentation/patient/medications/pages/add_medication_page.dart';
+import 'presentation/patient/medications/pages/medication_list_page.dart';
+import 'presentation/patient/pairing/cubit/pairing_cubit.dart';
 import 'presentation/patient/pairing/pages/pair_code_page.dart';
+import 'presentation/patient/reminders/cubit/reminder_cubit.dart';
+import 'presentation/patient/reminders/pages/today_reminders_page.dart';
 import 'presentation/shared/cubit/locale_cubit.dart';
+import 'presentation/shared/pages/unknown_route_page.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'core/utils/background_service.dart';
@@ -142,56 +152,167 @@ class MediCareApp extends StatelessWidget {
                 child: child ?? const SizedBox.shrink(),
               );
             },
-            initialRoute: '/',
-            routes: {
-              '/': (context) => const SplashPage(),
-              '/onboarding': (context) => const OnboardingPage(),
-              '/login': (context) => const LoginPage(),
-              '/register': (context) => const RegisterPage(),
-              '/patient/main': (context) => const PatientMainPage(),
-              '/caregiver/dashboard': (context) => const CaregiverMainPage(),
-              '/doctor/dashboard': (context) => const DoctorMainPage(),
-            },
-            onGenerateRoute: (settings) {
-              if (settings.name == '/patient/pairing') {
-                final args = settings.arguments as Map<String, dynamic>;
-                return MaterialPageRoute(
-                  builder: (context) => PairCodePage(
-                    patientId: args['patientId'] as String,
-                    patientName: args['patientName'] as String,
-                  ),
-                );
-              }
-
-              if (settings.name == '/caregiver/pairing') {
-                final args = settings.arguments as Map<String, dynamic>;
-                return MaterialPageRoute(
-                  builder: (context) => EnterPairCodePage(
-                    caregiverId: args['caregiverId'] as String,
-                    caregiverName: args['caregiverName'] as String,
-                  ),
-                );
-              }
-
-              if (settings.name == '/patient/medications/add') {
-                final args = settings.arguments as Map<String, dynamic>;
-                return MaterialPageRoute(
-                  builder: (context) => BlocProvider(
-                    create: (_) =>
-                        MedicationCubit(getIt<IMedicationRepository>()),
-                    child: AddMedicationPage(
-                      patientId: args['patientId'] as String,
-                      createdBy: args['createdBy'] as String? ?? '',
-                    ),
-                  ),
-                );
-              }
-
-              return null;
-            },
+            initialRoute: AppRoutes.splash,
+            onGenerateRoute: _onGenerateRoute,
           );
         },
       ),
     );
   }
+}
+
+Route<dynamic> _onGenerateRoute(RouteSettings settings) {
+  final name = settings.name;
+  final args = _routeArguments(settings);
+
+  switch (name) {
+    case AppRoutes.splash:
+      return _pageRoute(settings, const SplashPage());
+    case AppRoutes.roleSelection:
+      return _pageRoute(settings, const OnboardingPage());
+    case AppRoutes.login:
+      return _pageRoute(settings, const LoginPage());
+    case AppRoutes.register:
+      return _pageRoute(settings, const RegisterPage());
+    case AppRoutes.patientHome:
+    case AppRoutes.legacyPatientHome:
+      return _pageRoute(settings, const PatientMainPage());
+    case AppRoutes.medications: {
+      final patientId = args?['patientId'];
+      if (patientId is! String || patientId.isEmpty) {
+        return _unknownRoute(settings);
+      }
+      return _pageRoute(
+        settings,
+        BlocProvider(
+          create: (_) => MedicationCubit(getIt<IMedicationRepository>()),
+          child: MedicationListPage(patientId: patientId),
+        ),
+      );
+    }
+    case AppRoutes.addMedication: {
+      final patientId = args?['patientId'];
+      if (patientId is! String || patientId.isEmpty) {
+        return _unknownRoute(settings);
+      }
+      return _pageRoute(
+        settings,
+        BlocProvider(
+          create: (_) => MedicationCubit(getIt<IMedicationRepository>()),
+          child: AddMedicationPage(
+            patientId: patientId,
+            createdBy: args?['createdBy'] as String? ?? '',
+          ),
+        ),
+      );
+    }
+    case AppRoutes.reminders: {
+      final patientId = args?['patientId'];
+      if (patientId is! String || patientId.isEmpty) {
+        return _unknownRoute(settings);
+      }
+      return _pageRoute(
+        settings,
+        BlocProvider(
+          create: (_) => ReminderCubit(
+            intakeLogRepository: getIt<IIntakeLogRepository>(),
+            medicationRepository: getIt<IMedicationRepository>(),
+          ),
+          child: TodayRemindersPage(patientId: patientId),
+        ),
+      );
+    }
+    case AppRoutes.patientPairing: {
+      final patientId = args?['patientId'];
+      final patientName = args?['patientName'];
+      if (patientId is! String ||
+          patientId.isEmpty ||
+          patientName is! String) {
+        return _unknownRoute(settings);
+      }
+      return _pageRoute(
+        settings,
+        BlocProvider(
+          create: (_) => PairingCubit(getIt<IPairingRepository>()),
+          child: PairCodePage(
+            patientId: patientId,
+            patientName: patientName,
+          ),
+        ),
+      );
+    }
+    case AppRoutes.caregiverDashboard:
+      return _pageRoute(settings, const CaregiverMainPage());
+    case AppRoutes.caregiverPairing: {
+      final caregiverId = args?['caregiverId'];
+      final caregiverName = args?['caregiverName'];
+      if (caregiverId is! String ||
+          caregiverId.isEmpty ||
+          caregiverName is! String) {
+        return _unknownRoute(settings);
+      }
+      return _pageRoute(
+        settings,
+        BlocProvider(
+          create: (_) => PairingCubit(getIt<IPairingRepository>()),
+          child: EnterPairCodePage(
+            caregiverId: caregiverId,
+            caregiverName: caregiverName,
+          ),
+        ),
+      );
+    }
+    case AppRoutes.doctorDashboard:
+      return _pageRoute(settings, const DoctorMainPage());
+  }
+
+  final patientId = name == AppRoutes.patientDetail
+      ? args?['patientId']
+      : name != null && name.startsWith(AppRoutes.patientDetailPrefix)
+          ? name.substring(AppRoutes.patientDetailPrefix.length)
+          : null;
+  if (patientId is String) {
+    final patientName = args?['patientName'];
+    final doctor = args?['doctor'];
+
+    if (patientId.isNotEmpty &&
+        patientName is String &&
+        doctor is UserEntity) {
+      return _pageRoute(
+        settings,
+        DoctorPatientDetailPage(
+          patientId: patientId,
+          patientName: patientName,
+          doctor: doctor,
+        ),
+      );
+    }
+  }
+
+  return _unknownRoute(settings);
+}
+
+Map<String, dynamic>? _routeArguments(RouteSettings settings) {
+  final arguments = settings.arguments;
+  if (arguments is Map) {
+    return Map<String, dynamic>.from(arguments);
+  }
+  return null;
+}
+
+MaterialPageRoute<dynamic> _pageRoute(
+  RouteSettings settings,
+  Widget child,
+) {
+  return MaterialPageRoute(
+    settings: settings,
+    builder: (_) => child,
+  );
+}
+
+MaterialPageRoute<dynamic> _unknownRoute(RouteSettings settings) {
+  return _pageRoute(
+    settings,
+    UnknownRoutePage(routeName: settings.name),
+  );
 }

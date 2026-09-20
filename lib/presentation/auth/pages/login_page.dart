@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/localization/app_strings.dart';
@@ -42,11 +43,14 @@ class _LoginPageState extends State<LoginPage> {
       listener: (context, state) {
         if (state is AuthAuthenticated) {
           if (state.user.role == UserRole.patient) {
-            Navigator.pushReplacementNamed(context, '/patient/main');
+            Navigator.pushReplacementNamed(context, AppRoutes.patientHome);
           } else if (state.user.role == UserRole.doctor) {
-            Navigator.pushReplacementNamed(context, '/doctor/dashboard');
+            Navigator.pushReplacementNamed(context, AppRoutes.doctorDashboard);
           } else {
-            Navigator.pushReplacementNamed(context, '/caregiver/dashboard');
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.caregiverDashboard,
+            );
           }
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -189,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, '/register');
+                          Navigator.pushNamed(context, AppRoutes.register);
                         },
                         child: Text(
                           AppStrings.createAccount,

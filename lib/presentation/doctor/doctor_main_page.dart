@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/constants/app_routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/localization/app_language_cubit.dart';
 import '../../core/localization/app_strings.dart';
@@ -225,7 +226,7 @@ class _DoctorMainPageState extends State<DoctorMainPage> {
               ),
               onTap: () {
                 context.read<AuthCubit>().signOut();
-                Navigator.pushReplacementNamed(context, '/login');
+              Navigator.pushReplacementNamed(context, AppRoutes.login);
               },
             ),
           ],

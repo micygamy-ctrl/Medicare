@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/constants/app_routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user.dart';
@@ -63,20 +64,22 @@ class _SplashPageState extends State<SplashPage>
       listener: (context, state) async {
         if (state is AuthAuthenticated) {
           if (state.user.role == UserRole.patient) {
-            Navigator.pushReplacementNamed(context, '/patient/main');
+            Navigator.pushReplacementNamed(context, AppRoutes.patientHome);
           } else if (state.user.role == UserRole.doctor) {
-            Navigator.pushReplacementNamed(context, '/doctor/dashboard');
+            Navigator.pushReplacementNamed(context, AppRoutes.doctorDashboard);
           } else {
             Navigator.pushReplacementNamed(
-                context, '/caregiver/dashboard');
+              context,
+              AppRoutes.caregiverDashboard,
+            );
           }
         } else if (state is AuthUnauthenticated) {
           final firstTime = await _isFirstTime();
           if (mounted) {
             if (firstTime) {
-              Navigator.pushReplacementNamed(context, '/onboarding');
+              Navigator.pushReplacementNamed(context, AppRoutes.roleSelection);
             } else {
-              Navigator.pushReplacementNamed(context, '/login');
+              Navigator.pushReplacementNamed(context, AppRoutes.login);
             }
           }
         }

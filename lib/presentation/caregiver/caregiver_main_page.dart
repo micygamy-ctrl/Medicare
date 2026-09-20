@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/constants/app_routes.dart';
 import '../../core/di/injection.dart';
 import '../../core/localization/app_strings.dart';
 import '../../domain/repositories/i_pairing_repository.dart';
@@ -46,7 +47,7 @@ class _CaregiverMainPageState extends State<CaregiverMainPage> {
           child: BlocListener<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is AuthUnauthenticated) {
-                Navigator.pushReplacementNamed(context, '/login');
+                Navigator.pushReplacementNamed(context, AppRoutes.login);
               }
             },
             child: Scaffold(

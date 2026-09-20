@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../domain/entities/user.dart';
@@ -386,7 +387,7 @@ class DoctorPatientDetailPage extends StatelessWidget {
                       onPressed: () {
                         Navigator.pushNamed(
                           context,
-                          '/patient/medications/add',
+                          AppRoutes.addMedication,
                           arguments: {
                             'patientId': patientId,
                             'createdBy': doctor.uid,

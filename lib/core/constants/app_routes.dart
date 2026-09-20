@@ -8,6 +8,7 @@ class AppRoutes {
 
   // Patient
   static const String patientHome = '/patient/home';
+  static const String legacyPatientHome = '/patient/main';
   static const String medications = '/patient/medications';
   static const String addMedication = '/patient/medications/add';
   static const String reminders = '/patient/reminders';
@@ -16,5 +17,9 @@ class AppRoutes {
   // Caregiver
   static const String caregiverDashboard = '/caregiver/dashboard';
   static const String patientDetail = '/caregiver/patient/:patientId';
+  static const String patientDetailPrefix = '/caregiver/patient/';
   static const String caregiverPairing = '/caregiver/pairing';
+
+  // Doctor
+  static const String doctorDashboard = '/doctor/dashboard';
 }

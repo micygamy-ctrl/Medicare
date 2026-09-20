@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../shared/widgets/primary_button.dart';
@@ -51,7 +52,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         curve: Curves.easeInOut,
       );
     } else {
-      Navigator.pushReplacementNamed(context, '/login');
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
     }
   }
 
@@ -67,7 +68,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               alignment: Alignment.topLeft,
               child: TextButton(
                 onPressed: () =>
-                    Navigator.pushReplacementNamed(context, '/login'),
+                    Navigator.pushReplacementNamed(context, AppRoutes.login),
                 child: Text(
                   'تخطي',
                   style: AppTextStyles.bodyMedium.copyWith(

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/localization/app_strings.dart';
@@ -73,7 +74,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
             onPressed: () async {
               final result = await Navigator.pushNamed(
                 context,
-                '/patient/medications/add',
+                AppRoutes.addMedication,
                 arguments: <String, dynamic>{
                   'patientId': widget.patientId,
                   'createdBy': widget.patientId,

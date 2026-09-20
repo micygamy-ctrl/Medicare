@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/constants/app_routes.dart';
 import '../../../core/di/injection.dart';
 import '../../../domain/repositories/i_intake_log_repository.dart';
 import '../../../domain/repositories/i_lab_report_repository.dart';
@@ -32,7 +33,7 @@ class PatientMainPage extends StatelessWidget {
         return BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthUnauthenticated) {
-              Navigator.pushReplacementNamed(context, '/login');
+              Navigator.pushReplacementNamed(context, AppRoutes.login);
             }
           },
           child: MultiBlocProvider(
