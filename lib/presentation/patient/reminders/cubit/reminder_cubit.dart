@@ -79,47 +79,53 @@ class ReminderCubit extends Cubit<ReminderState> {
   }
 
   Future<void> _createMissingLogs(String patientId) async {
-      final medications = await _medicationRepository
-          .getPatientMedications(patientId)
-          .first;
+    final medications = await _medicationRepository
+        .getPatientMedications(patientId)
+        .first;
 
-      final existingLogs = await _intakeLogRepository
-          .getTodayLogs(patientId)
-          .first;
+    final existingLogs = await _intakeLogRepository
+        .getTodayLogs(patientId)
+        .first;
 
-      final now = DateTime.now();
+    final now = DateTime.now();
 
-      for (final medication in medications) {
-        if (!medication.isActive) continue;
+    for (final medication in medications) {
+      if (!medication.isActive) continue;
 
-        for (final schedule in medication.schedules) {
-          for (final time in schedule.times) {
-            final parts = time.split(':');
-            final hour = int.parse(parts[0]);
-            final minute = int.parse(parts[1]);
+      for (final schedule in medication.schedules) {
+        for (final time in schedule.times) {
+          final parts = time.split(':');
+          final hour = int.parse(parts[0]);
+          final minute = int.parse(parts[1]);
 
-            final scheduledTime = DateTime(
-              now.year, now.month, now.day, hour, minute,
-            );
+          final scheduledTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            hour,
+            minute,
+          );
 
-            // تحقق دقيق من وجود الـ log
-            final exists = existingLogs.any((log) =>
+          // تحقق دقيق من وجود الـ log
+          final exists = existingLogs.any(
+            (log) =>
                 log.medicationId == medication.id &&
                 log.scheduledTime.hour == scheduledTime.hour &&
                 log.scheduledTime.minute == scheduledTime.minute &&
-                log.scheduledTime.day == scheduledTime.day);
+                log.scheduledTime.day == scheduledTime.day,
+          );
 
-            if (!exists) {
-              await _intakeLogRepository.createIntakeLog(
-                medicationId: medication.id,
-                medicationName: medication.name,
-                patientId: patientId,
-                scheduledTime: scheduledTime,
-              );
-            }
+          if (!exists) {
+            await _intakeLogRepository.createIntakeLog(
+              medicationId: medication.id,
+              medicationName: medication.name,
+              patientId: patientId,
+              scheduledTime: scheduledTime,
+            );
           }
         }
       }
+    }
   }
 
   Future<void> markAsTaken(String logId) async {
