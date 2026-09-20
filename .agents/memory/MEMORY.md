@@ -1,0 +1,1 @@
+- [Post-merge hook configuration](post-merge-hooks.md) — Configure `.replit` post-merge hooks through the Replit setup API, not direct file edits.
