@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../presentation/patient/pairing/cubit/pairing_cubit.dart';
@@ -43,7 +44,7 @@ class _EnterPairCodePageState extends State<EnterPairCodePage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('ربط حساب مريض'),
+        title: Text(AppStrings.linkWithPatient),
         backgroundColor: AppColors.surface,
       ),
       body: BlocConsumer<PairingCubit, PairingState>(
@@ -52,7 +53,7 @@ class _EnterPairCodePageState extends State<EnterPairCodePage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'تم الربط بنجاح مع ${state.pair.patientName}',
+                  '${AppStrings.pairSuccess} (${state.pair.patientName})',
                 ),
                 backgroundColor: AppColors.success,
               ),
@@ -94,14 +95,14 @@ class _EnterPairCodePageState extends State<EnterPairCodePage> {
                   ),
                   const SizedBox(height: 24),
 
-                  const Text(
-                    'أدخل كود الربط',
+                  Text(
+                    AppStrings.enterPairCode,
                     style: AppTextStyles.h2,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'اطلب من المريض كود الربط المكون من 6 أرقام',
+                    AppStrings.enterPatientCodeSubtitle,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -156,10 +157,10 @@ class _EnterPairCodePageState extends State<EnterPairCodePage> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'من فضلك أدخل الكود';
+                        return AppStrings.pairCodeInvalid;
                       }
                       if (value.length != 6) {
-                        return 'الكود يجب أن يكون 6 أرقام';
+                        return AppStrings.pairCodeInvalid;
                       }
                       return null;
                     },
@@ -182,7 +183,7 @@ class _EnterPairCodePageState extends State<EnterPairCodePage> {
                                 strokeWidth: 2.5,
                               ),
                             )
-                          : const Text('ربط الحساب'),
+                          : Text(AppStrings.pairButton),
                     ),
                   ),
                 ],

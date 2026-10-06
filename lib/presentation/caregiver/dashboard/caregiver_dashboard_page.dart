@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+<<<<<<< HEAD
 import '../../../core/localization/app_language_cubit.dart';
+=======
+>>>>>>> 7ff46f90ac9e218605f8402799e008424b7c7de8
 import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -81,7 +84,7 @@ class _DashboardView extends StatelessWidget {
                     onPressed: () => context
                         .read<DashboardCubit>()
                         .loadDashboard(caregiverId),
-                    child: const Text('إعادة المحاولة'),
+                    child: Text(AppStrings.retry),
                   ),
                 ],
               ),
@@ -109,7 +112,7 @@ class _DashboardView extends StatelessWidget {
 
                     // Patients List
                     Text(
-                      'المرضى المرتبطون (${state.patients.length})',
+                      '${AppStrings.linkedPatients} (${state.patients.length})',
                       style: AppTextStyles.h3,
                     ),
                     const SizedBox(height: 12),
@@ -176,7 +179,7 @@ class _SummaryCard extends StatelessWidget {
                   color: Colors.white, size: 20),
               const SizedBox(width: 8),
               Text(
-                'ملخص اليوم',
+                AppStrings.todaySummaryLabel,
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   color: Colors.white.withOpacity(0.9),
@@ -190,28 +193,28 @@ class _SummaryCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _SummaryItem(
-                  label: 'المرضى',
+                  label: AppStrings.patients,
                   value: patients.length.toString(),
                   icon: Icons.people_rounded,
                 ),
               ),
               Expanded(
                 child: _SummaryItem(
-                  label: 'الأدوية',
+                  label: AppStrings.medications,
                   value: totalMedications.toString(),
                   icon: Icons.medication_rounded,
                 ),
               ),
               Expanded(
                 child: _SummaryItem(
-                  label: 'تم التناول',
+                  label: AppStrings.takenLabel,
                   value: totalTaken.toString(),
                   icon: Icons.check_circle_rounded,
                 ),
               ),
               Expanded(
                 child: _SummaryItem(
-                  label: 'فائتة',
+                  label: AppStrings.missedLabel,
                   value: totalMissed.toString(),
                   icon: Icons.cancel_rounded,
                 ),
@@ -231,7 +234,7 @@ class _SummaryCard extends StatelessWidget {
                     color: Colors.white, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'متوسط الالتزام: ${avgAdherence.toStringAsFixed(0)}%',
+                  AppStrings.avgAdherenceValue(avgAdherence.toStringAsFixed(0)),
                   style: const TextStyle(
                     fontFamily: 'Cairo',
                     color: Colors.white,
@@ -339,7 +342,7 @@ class _PatientCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${summary.medications.length} أدوية',
+                        AppStrings.patientMedCount(summary.medications.length),
                         style: AppTextStyles.caption,
                       ),
                     ],
@@ -375,7 +378,7 @@ class _PatientCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _MiniStat(
-                    label: 'تم التناول',
+                    label: AppStrings.takenLabel,
                     value: summary.takenToday.toString(),
                     color: AppColors.success,
                     icon: Icons.check_circle_outline_rounded,
@@ -384,7 +387,7 @@ class _PatientCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: _MiniStat(
-                    label: 'فائتة',
+                    label: AppStrings.missedLabel,
                     value: summary.missedToday.toString(),
                     color: AppColors.error,
                     icon: Icons.cancel_outlined,
@@ -393,7 +396,7 @@ class _PatientCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: _MiniStat(
-                    label: 'انتظار',
+                    label: AppStrings.pendingLabel,
                     value: summary.pendingToday.toString(),
                     color: AppColors.primary,
                     icon: Icons.access_time_rounded,
@@ -423,16 +426,16 @@ class _PatientCard extends StatelessWidget {
                   color: AppColors.primaryLight,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.watch_rounded, color: AppColors.primary, size: 18),
-                        SizedBox(width: 8),
+                        const Icon(Icons.watch_rounded, color: AppColors.primary, size: 18),
+                        const SizedBox(width: 8),
                         Text(
-                          'مراقبة نبضات القلب والضغط والساعة الذكية',
-                          style: TextStyle(
+                          AppStrings.vitalsMonitorButton,
+                          style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
@@ -441,7 +444,7 @@ class _PatientCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.primary),
+                    const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.primary),
                   ],
                 ),
               ),
@@ -463,7 +466,7 @@ class _PatientCard extends StatelessWidget {
                         color: AppColors.error, size: 16),
                     const SizedBox(width: 8),
                     Text(
-                      'فاتت ${summary.missedToday} جرعة اليوم',
+                      AppStrings.missedDosesToday(summary.missedToday),
                       style: AppTextStyles.caption.copyWith(
                         color: AppColors.error,
                         fontWeight: FontWeight.w600,
@@ -541,7 +544,7 @@ class _EmptyDashboard extends StatelessWidget {
             Container(
               width: 100,
               height: 100,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.primaryLight,
                 shape: BoxShape.circle,
               ),
@@ -552,11 +555,11 @@ class _EmptyDashboard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('لا يوجد مرضى مرتبطون',
+            Text(AppStrings.noLinkedPatients,
                 style: AppTextStyles.h3),
             const SizedBox(height: 8),
             Text(
-              'اضغط على "ربط مريض" لإضافة مريض',
+              AppStrings.emptyDashboardHint,
               style: AppTextStyles.bodyMedium
                   .copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,

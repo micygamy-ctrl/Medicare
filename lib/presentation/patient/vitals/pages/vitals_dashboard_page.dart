@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../domain/entities/vital_sign.dart';
 import '../../../shared/widgets/error_view.dart';
@@ -36,13 +37,13 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.add_task_rounded, color: AppColors.primary),
-            SizedBox(width: 8),
+            const Icon(Icons.add_task_rounded, color: AppColors.primary),
+            const SizedBox(width: 8),
             Text(
-              'تسجيل قراءة حيوية جديدة',
-              style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 16),
+              AppStrings.vitalsManualTitle,
+              style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ],
         ),
@@ -56,7 +57,7 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                     child: TextField(
                       controller: sysController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'ضغط انقباضي (Systolic)'),
+                      decoration: InputDecoration(labelText: AppStrings.vitalsSystolic),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -64,7 +65,7 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                     child: TextField(
                       controller: diaController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'ضغط انبساطي (Diastolic)'),
+                      decoration: InputDecoration(labelText: AppStrings.vitalsDiastolic),
                     ),
                   ),
                 ],
@@ -73,7 +74,7 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
               TextField(
                 controller: hrController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'نبضات القلب (BPM)'),
+                decoration: InputDecoration(labelText: AppStrings.vitalsHRLabel),
               ),
               const SizedBox(height: 12),
               Row(
@@ -82,7 +83,7 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                     child: TextField(
                       controller: spO2Controller,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'أكسجين SpO2 (%)'),
+                      decoration: InputDecoration(labelText: AppStrings.vitalsSpO2Label),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -90,7 +91,7 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                     child: TextField(
                       controller: tempController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'الحرارة (°C)'),
+                      decoration: InputDecoration(labelText: AppStrings.vitalsTempLabel),
                     ),
                   ),
                 ],
@@ -101,7 +102,7 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo')),
+            child: Text(AppStrings.cancel, style: const TextStyle(fontFamily: 'Cairo')),
           ),
           ElevatedButton(
             onPressed: () {
@@ -122,15 +123,15 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
 
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تم حفظ القراءة الحيوية بنجاح ✓'),
+                SnackBar(
+                  content: Text(AppStrings.vitalsSaved),
                   backgroundColor: AppColors.success,
                   behavior: SnackBarBehavior.floating,
                 ),
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-            child: const Text('حفظ', style: TextStyle(fontFamily: 'Cairo', color: Colors.white)),
+            child: Text(AppStrings.save, style: const TextStyle(fontFamily: 'Cairo', color: Colors.white)),
           ),
         ],
       ),
@@ -142,15 +143,15 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
-          'المؤشرات الحيوية والساعة الذكية',
-          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+        title: Text(
+          AppStrings.vitalsHomeTitle,
+          style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
         ),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.history_rounded),
-            tooltip: 'سجل القراءات',
+            tooltip: AppStrings.vitalsHistoryTooltip,
             onPressed: () {
               Navigator.push(
                 context,
@@ -165,7 +166,7 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
           ),
           IconButton(
             icon: const Icon(Icons.add_rounded),
-            tooltip: 'إضافة يدوية',
+            tooltip: AppStrings.vitalsManualTooltip,
             onPressed: () => _showAddManualDialog(context),
           ),
         ],
@@ -173,15 +174,15 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
       body: BlocBuilder<VitalsCubit, VitalsState>(
         builder: (context, state) {
           if (state is VitalsLoading || state is VitalsSyncing) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: AppColors.primary),
-                  SizedBox(height: 16),
+                  const CircularProgressIndicator(color: AppColors.primary),
+                  const SizedBox(height: 16),
                   Text(
-                    'جاري المزامنة مع الحساسات والساعة الذكية... ⌚',
-                    style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+                    AppStrings.vitalsSyncing,
+                    style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -236,26 +237,26 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                             color: Colors.white, size: 32),
                       ),
                       const SizedBox(width: 14),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'الساعة الذكية متصلة ⌚',
-                              style: TextStyle(
+                              AppStrings.vitalsSmartwatch,
+                              style: const TextStyle(
                                 fontFamily: 'Cairo',
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
-                              'مزامنة فورية لنبضات القلب والضغط والأكسجين',
+                              AppStrings.vitalsSmartwatchSub,
                               style: TextStyle(
                                 fontFamily: 'Cairo',
                                 fontSize: 11,
-                                color: Colors.white70,
+                                color: Colors.white.withOpacity(0.7),
                               ),
                             ),
                           ],
@@ -276,9 +277,9 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 14, vertical: 10),
                         ),
-                        child: const Text(
-                          'مزامنة',
-                          style: TextStyle(
+                        child: Text(
+                          AppStrings.vitalsSync,
+                          style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
@@ -300,15 +301,15 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.error, width: 2),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.warning_amber_rounded,
+                        const Icon(Icons.warning_amber_rounded,
                             color: AppColors.error, size: 32),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'تنبيه طارئ: تم اكتشاف قراءات حيوية خارج المعدل الطبيعي! تم إشعار المرافق والطبيب فوراً.',
-                            style: TextStyle(
+                            AppStrings.vitalsCriticalAlert,
+                            style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -321,9 +322,9 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                   ),
 
                 // Section Title
-                const Text(
-                  'آخر القراءات الحيوية الحية',
-                  style: TextStyle(
+                Text(
+                  AppStrings.vitalsLatestTitle,
+                  style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -336,7 +337,7 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                   children: [
                     Expanded(
                       child: _VitalMetricCard(
-                        title: 'ضغط الدم',
+                        title: AppStrings.bloodPressure,
                         value: latest != null
                             ? '${latest.systolicBP}/${latest.diastolicBP}'
                             : '120/80',
@@ -344,21 +345,21 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                         icon: Icons.favorite_rounded,
                         color: Colors.red.shade600,
                         statusText: latest != null && latest.systolicBP >= 140
-                            ? 'مرتفع'
-                            : 'طبيعي',
+                            ? AppStrings.statusHigh
+                            : AppStrings.statusNormal,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _VitalMetricCard(
-                        title: 'نبضات القلب',
+                        title: AppStrings.heartRate,
                         value: latest != null ? '${latest.heartRate}' : '72',
                         unit: 'BPM',
                         icon: Icons.monitor_heart_rounded,
                         color: Colors.pink.shade500,
                         statusText: latest != null && latest.heartRate >= 100
-                            ? 'سريع'
-                            : 'طبيعي',
+                            ? AppStrings.statusFast
+                            : AppStrings.statusNormal,
                       ),
                     ),
                   ],
@@ -368,27 +369,27 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
                   children: [
                     Expanded(
                       child: _VitalMetricCard(
-                        title: 'نسبة الأكسجين',
+                        title: AppStrings.oxygenSat,
                         value: latest != null ? '${latest.spO2}%' : '98%',
                         unit: 'SpO2',
                         icon: Icons.air_rounded,
                         color: Colors.blue.shade600,
                         statusText: latest != null && latest.spO2 <= 92
-                            ? 'منخفض'
-                            : 'ممتاز',
+                            ? AppStrings.statusLow
+                            : AppStrings.statusExcellent,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _VitalMetricCard(
-                        title: 'درجة الحرارة',
+                        title: AppStrings.bodyTemp,
                         value: latest != null
                             ? '${latest.temperature}°'
                             : '36.8°',
                         unit: 'Celsius',
                         icon: Icons.thermostat_rounded,
                         color: Colors.orange.shade700,
-                        statusText: 'طبيعي',
+                        statusText: AppStrings.statusNormal,
                       ),
                     ),
                   ],
@@ -397,7 +398,7 @@ class _VitalsDashboardPageState extends State<VitalsDashboardPage> {
 
                 // Action Buttons
                 PrimaryButton(
-                  label: 'عرض سجل القراءات والرسوم البيانية 📊',
+                  label: AppStrings.vitalsViewHistory,
                   onPressed: () {
                     Navigator.push(
                       context,

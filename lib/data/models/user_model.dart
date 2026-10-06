@@ -37,6 +37,13 @@ class UserModel extends UserEntity {
       role = UserRole.patient;
     }
 
+    DateTime _parseDate(dynamic val) {
+      if (val is Timestamp) return val.toDate();
+      if (val is String) return DateTime.tryParse(val) ?? DateTime.now();
+      if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+      return DateTime.now();
+    }
+
     return UserModel(
       uid: doc.id,
       displayName: data['displayName'] ?? '',
@@ -46,12 +53,12 @@ class UserModel extends UserEntity {
       locale: data['locale'] == 'en' ? AppLocale.en : AppLocale.ar,
       photoUrl: data['photoUrl'],
       fcmToken: data['fcmToken'],
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      createdAt: data['createdAt'] != null ? _parseDate(data['createdAt']) : DateTime.now(),
       specialization: data['specialization'],
       licenseNumber: data['licenseNumber'],
       assignedPatients: List<String>.from(data['assignedPatients'] ?? []),
       dateOfBirth: data['dateOfBirth'] != null
-          ? (data['dateOfBirth'] as Timestamp).toDate()
+          ? _parseDate(data['dateOfBirth'])
           : null,
       gender: data['gender'],
       bloodType: _bloodTypeFromString(data['bloodType']),
@@ -84,6 +91,7 @@ class UserModel extends UserEntity {
       'fcmToken': fcmToken,
       'createdAt': Timestamp.fromDate(createdAt),
       'isDeleted': false,
+      'isApproved': role == UserRole.doctor ? true : true,
       'specialization': specialization,
       'licenseNumber': licenseNumber,
       'assignedPatients': assignedPatients,

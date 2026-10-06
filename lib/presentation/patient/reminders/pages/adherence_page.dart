@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../domain/entities/intake_log.dart';
@@ -49,7 +50,6 @@ class _AdherencePageState extends State<AdherencePage> {
         endDate: now,
       );
 
-      // حساب إحصائيات كل يوم
       final Map<String, int> dailyTaken = {};
       for (final log in logs) {
         final day = _getDayName(log.scheduledTime.weekday);
@@ -71,15 +71,28 @@ class _AdherencePageState extends State<AdherencePage> {
   }
 
   String _getDayName(int weekday) {
-    switch (weekday) {
-      case 1: return 'الإثنين';
-      case 2: return 'الثلاثاء';
-      case 3: return 'الأربعاء';
-      case 4: return 'الخميس';
-      case 5: return 'الجمعة';
-      case 6: return 'السبت';
-      case 7: return 'الأحد';
-      default: return '';
+    if (AppStrings.isAr) {
+      switch (weekday) {
+        case 1: return 'الإثنين';
+        case 2: return 'الثلاثاء';
+        case 3: return 'الأربعاء';
+        case 4: return 'الخميس';
+        case 5: return 'الجمعة';
+        case 6: return 'السبت';
+        case 7: return 'الأحد';
+        default: return '';
+      }
+    } else {
+      switch (weekday) {
+        case 1: return 'Mon';
+        case 2: return 'Tue';
+        case 3: return 'Wed';
+        case 4: return 'Thu';
+        case 5: return 'Fri';
+        case 6: return 'Sat';
+        case 7: return 'Sun';
+        default: return '';
+      }
     }
   }
 
@@ -88,7 +101,7 @@ class _AdherencePageState extends State<AdherencePage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('إحصائيات الالتزام'),
+        title: Text(AppStrings.adherenceTitle),
         automaticallyImplyLeading: false,
       ),
       body: _isLoading
@@ -107,7 +120,7 @@ class _AdherencePageState extends State<AdherencePage> {
                       children: [
                         Expanded(
                           child: _AdherenceCard(
-                            title: 'الالتزام الأسبوعي',
+                            title: AppStrings.isAr ? 'الالتزام الأسبوعي' : 'Weekly Adherence',
                             percentage: _weeklyAdherence,
                             icon: Icons.calendar_view_week_rounded,
                             days: 7,
@@ -116,7 +129,7 @@ class _AdherencePageState extends State<AdherencePage> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: _AdherenceCard(
-                            title: 'الالتزام الشهري',
+                            title: AppStrings.isAr ? 'الالتزام الشهري' : 'Monthly Adherence',
                             percentage: _monthlyAdherence,
                             icon: Icons.calendar_month_rounded,
                             days: 30,
@@ -127,24 +140,24 @@ class _AdherencePageState extends State<AdherencePage> {
                     const SizedBox(height: 24),
 
                     // Weekly Bar Chart
-                    Text('الالتزام هذا الأسبوع', style: AppTextStyles.h3),
+                    Text(AppStrings.isAr ? 'الالتزام هذا الأسبوع' : 'This Week Adherence', style: AppTextStyles.h3),
                     const SizedBox(height: 12),
                     _WeeklyChart(stats: _weeklyStats),
                     const SizedBox(height: 24),
 
                     // Status Summary
-                    Text('ملخص الجرعات', style: AppTextStyles.h3),
+                    Text(AppStrings.isAr ? 'ملخص الجرعات' : 'Doses Summary', style: AppTextStyles.h3),
                     const SizedBox(height: 12),
                     _StatusSummary(logs: _recentLogs),
                     const SizedBox(height: 24),
 
                     // Recent Logs
-                    Text('آخر الجرعات', style: AppTextStyles.h3),
+                    Text(AppStrings.isAr ? 'آخر الجرعات' : 'Recent Doses', style: AppTextStyles.h3),
                     const SizedBox(height: 12),
                     if (_recentLogs.isEmpty)
                       Center(
                         child: Text(
-                          'لا توجد سجلات بعد',
+                          AppStrings.adherenceNoData,
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -239,82 +252,83 @@ class _WeeklyChart extends StatelessWidget {
 
   const _WeeklyChart({required this.stats});
 
-
   @override
-Widget build(BuildContext context) {
-  final days = ['الجمعة','الخميس','الأربعاء','الثلاثاء','الإثنين','الأحد','السبت'];
-  final dayKeys = [
-     'الجمعة','الخميس','الأربعاء','الثلاثاء','الإثنين','الأحد','السبت'
-  ];
+  Widget build(BuildContext context) {
+    final days = AppStrings.isAr
+        ? ['الجمعة', 'الخميس', 'الأربعاء', 'الثلاثاء', 'الإثنين', 'الأحد', 'السبت']
+        : ['Fri', 'Thu', 'Wed', 'Tue', 'Mon', 'Sun', 'Sat'];
+    final dayKeys = AppStrings.isAr
+        ? ['الجمعة', 'الخميس', 'الأربعاء', 'الثلاثاء', 'الإثنين', 'الأحد', 'السبت']
+        : ['Fri', 'Thu', 'Wed', 'Tue', 'Mon', 'Sun', 'Sat'];
 
-  final maxValue = stats.values.isEmpty
-      ? 1
-      : stats.values.reduce((a, b) => a > b ? a : b);
+    final maxValue = stats.values.isEmpty
+        ? 1
+        : stats.values.reduce((a, b) => a > b ? a : b);
 
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: AppColors.cardBorder),
-    ),
-    child: Column(
-      children: [
-        SizedBox(
-          height: 150,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: List.generate(7, (index) {
-              final day = dayKeys[index];
-              final value = stats[day] ?? 0;
-              final barHeight = maxValue == 0
-                  ? 0.0
-                  : (value / maxValue) * 100;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 150,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: List.generate(7, (index) {
+                final day = dayKeys[index];
+                final value = stats[day] ?? 0;
+                final barHeight = maxValue == 0
+                    ? 0.0
+                    : (value / maxValue) * 100;
 
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (value > 0)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Text(
-                            value.toString(),
-                            style: AppTextStyles.caption.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w700,
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (value > 0)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text(
+                              value.toString(),
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
+                        Container(
+                          height: barHeight + 4,
+                          decoration: BoxDecoration(
+                            color: value > 0
+                                ? AppColors.primary
+                                : AppColors.divider,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
-                      Container(
-                        height: barHeight + 4,
-                        decoration: BoxDecoration(
-                          color: value > 0
-                              ? AppColors.primary
-                              : AppColors.divider,
-                          borderRadius: BorderRadius.circular(4),
+                        const SizedBox(height: 8),
+                        Text(
+                          days[index],
+                          style: AppTextStyles.caption,
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        days[index],
-                        style: AppTextStyles.caption,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 }
 
 // Status Summary
@@ -333,7 +347,7 @@ class _StatusSummary extends StatelessWidget {
       children: [
         Expanded(
           child: _StatusBox(
-            label: 'تم التناول',
+            label: AppStrings.takenLabel,
             value: taken,
             color: AppColors.success,
             icon: Icons.check_circle_rounded,
@@ -342,7 +356,7 @@ class _StatusSummary extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _StatusBox(
-            label: 'فائتة',
+            label: AppStrings.missedLabel,
             value: missed,
             color: AppColors.error,
             icon: Icons.cancel_rounded,
@@ -351,7 +365,7 @@ class _StatusSummary extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _StatusBox(
-            label: 'انتظار',
+            label: AppStrings.pendingLabel,
             value: pending,
             color: AppColors.primary,
             icon: Icons.access_time_rounded,
@@ -420,10 +434,10 @@ class _LogItem extends StatelessWidget {
 
   String get _statusText {
     switch (log.status) {
-      case IntakeStatus.taken: return 'تم التناول';
-      case IntakeStatus.missed: return 'فائتة';
-      case IntakeStatus.snoozed: return 'مؤجلة';
-      default: return 'انتظار';
+      case IntakeStatus.taken: return AppStrings.takenLabel;
+      case IntakeStatus.missed: return AppStrings.missedLabel;
+      case IntakeStatus.snoozed: return AppStrings.snoozed;
+      default: return AppStrings.pendingLabel;
     }
   }
 

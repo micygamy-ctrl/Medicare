@@ -143,6 +143,15 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> signOut() async {
     await NotificationScheduler.cancelAll();
+    try {
+      final currentUser = await _authRepository.getCurrentUser();
+      if (currentUser != null && _medicationRepository != null) {
+        final medications = await _medicationRepository!
+            .getPatientMedications(currentUser.uid)
+            .first;
+        await AlarmService.cancelAll(medications);
+      }
+    } catch (_) {}
     await _authRepository.signOut();
     emit(AuthUnauthenticated());
   }

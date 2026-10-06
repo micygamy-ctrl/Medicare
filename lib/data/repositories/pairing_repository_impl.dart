@@ -61,8 +61,16 @@ class PairingRepositoryImpl implements IPairingRepository {
 
       return code;
     } catch (e) {
+<<<<<<< HEAD
       print('Error in generatePairingCode: $e');
       throw ServerFailure('فشل في توليد الكود: $e');
+=======
+      assert(() {
+        print('Error in generatePairingCode: $e');
+        return true;
+      }());
+      throw ServerFailure('فشل في توليد الكود: ${e.toString()}');
+>>>>>>> 7ff46f90ac9e218605f8402799e008424b7c7de8
     }
   }
 
