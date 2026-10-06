@@ -121,6 +121,7 @@ class NotificationScheduler {
     visibility: NotificationVisibility.public,
     fullScreenIntent: true,
     category: AndroidNotificationCategory.alarm,
+    audioAttributesUsage: AudioAttributesUsage.alarm,
     ongoing: false,
     autoCancel: true,
     timeoutAfter: 60000,

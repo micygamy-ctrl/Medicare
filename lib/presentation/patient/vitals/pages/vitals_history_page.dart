@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/localization/app_language_cubit.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../domain/entities/vital_sign.dart';
 import '../../../shared/widgets/error_view.dart';
@@ -12,12 +14,14 @@ class VitalsHistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AppLanguageCubit>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
-          'سجل قراءات المؤشرات الحيوية',
-          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+        title: Text(
+          AppStrings.vitalsHistoryTitle,
+          style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.surface,
       ),
@@ -38,10 +42,10 @@ class VitalsHistoryPage extends StatelessWidget {
 
           if (state is VitalsLoaded) {
             if (state.vitals.isEmpty) {
-              return const Center(
+              return Center(
                 child: Text(
-                  'لا توجد قراءات حيوية سابقة',
-                  style: TextStyle(
+                  AppStrings.noVitalsHistory,
+                  style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 14,
                     color: AppColors.textSecondary,
@@ -94,24 +98,24 @@ class _VitalHistoryCard extends StatelessWidget {
   String _getStatusText() {
     switch (item.status) {
       case VitalStatus.normal:
-        return 'طبيعي';
+        return AppStrings.statusNormal;
       case VitalStatus.warning:
-        return 'تحذير';
+        return AppStrings.statusWarning;
       case VitalStatus.critical:
-        return 'حرج ⚠️';
+        return AppStrings.statusCritical;
     }
   }
 
   String _getSourceText() {
     switch (item.source) {
       case VitalSource.smartwatch:
-        return 'ساعة ذكية ⌚';
+        return AppStrings.sourceSmartwatch;
       case VitalSource.bluetoothSensor:
-        return 'حساس بلوتوث 📡';
+        return AppStrings.sourceSensor;
       case VitalSource.healthKit:
-        return 'تطبيق الصحة';
+        return AppStrings.sourceHealthKit;
       case VitalSource.manual:
-        return 'إدخال يدوي ✍️';
+        return AppStrings.sourceManual;
     }
   }
 
@@ -191,10 +195,10 @@ class _VitalHistoryCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildSubMetric(
-                    'ضغط الدم', '${item.systolicBP}/${item.diastolicBP}', 'mmHg'),
-                _buildSubMetric('النبض', '${item.heartRate}', 'BPM'),
-                _buildSubMetric('الأكسجين', '${item.spO2}%', 'SpO2'),
-                _buildSubMetric('الحرارة', '${item.temperature}°', 'C'),
+                    AppStrings.bloodPressure, '${item.systolicBP}/${item.diastolicBP}', 'mmHg'),
+                _buildSubMetric(AppStrings.heartRate, '${item.heartRate}', 'BPM'),
+                _buildSubMetric(AppStrings.oxygenSat, '${item.spO2}%', 'SpO2'),
+                _buildSubMetric(AppStrings.bodyTemp, '${item.temperature}°', 'C'),
               ],
             ),
           ],

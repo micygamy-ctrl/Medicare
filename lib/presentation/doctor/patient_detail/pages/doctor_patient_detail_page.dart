@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/localization/app_language_cubit.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../domain/entities/user.dart';
 import '../../../../domain/repositories/i_lab_report_repository.dart';
@@ -26,11 +28,12 @@ class DoctorPatientDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AppLanguageCubit>();
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
-          'ملف المريض: $patientName',
+          '${AppStrings.patientFile}: $patientName',
           style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
@@ -45,19 +48,19 @@ class DoctorPatientDetailPage extends StatelessWidget {
           }
 
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(
+            return Center(
               child: Text(
-                'تعذر تحميل بيانات المريض',
-                style: TextStyle(fontFamily: 'Cairo'),
+                AppStrings.couldNotLoadPatientData,
+                style: const TextStyle(fontFamily: 'Cairo'),
               ),
             );
           }
 
           final data = snapshot.data!.data() as Map<String, dynamic>;
-          final bloodType = data['bloodType'] ?? 'غير محدد';
-          final gender = data['gender'] ?? 'غير محدد';
-          final emergencyName = data['emergencyContactName'] ?? 'غير محدد';
-          final emergencyPhone = data['emergencyContactPhone'] ?? 'غير محدد';
+          final bloodType = data['bloodType'] ?? AppStrings.notSpecified;
+          final gender = data['gender'] ?? AppStrings.notSpecified;
+          final emergencyName = data['emergencyContactName'] ?? AppStrings.notSpecified;
+          final emergencyPhone = data['emergencyContactPhone'] ?? AppStrings.notSpecified;
           final chronicDiseases = List<String>.from(data['chronicDiseases'] ?? []);
           final allergies = List<String>.from(data['allergies'] ?? []);
 

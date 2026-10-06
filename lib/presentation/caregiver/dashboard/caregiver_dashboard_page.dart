@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/localization/app_language_cubit.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../auth/cubit/auth_cubit.dart';
@@ -17,6 +19,7 @@ class CaregiverDashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AppLanguageCubit>();
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, authState) {
         final user =
@@ -49,10 +52,11 @@ class _DashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AppLanguageCubit>();
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('لوحة المتابعة'),
+        title: Text(AppStrings.caregiverDashboard),
       ),
       body: BlocBuilder<DashboardCubit, DashboardState>(
         builder: (context, state) {

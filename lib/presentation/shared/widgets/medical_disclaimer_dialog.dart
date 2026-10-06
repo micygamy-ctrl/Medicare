@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 
 class MedicalDisclaimerDialog extends StatelessWidget {
@@ -24,8 +25,8 @@ class MedicalDisclaimerDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => !isMandatory,
+    return PopScope(
+      canPop: !isMandatory,
       child: Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Padding(
@@ -38,7 +39,7 @@ class MedicalDisclaimerDialog extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.12),
+                  color: AppColors.primary.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -50,9 +51,9 @@ class MedicalDisclaimerDialog extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Title
-              const Text(
-                'إخلاء مسؤولية طبي وشروط الاستخدام',
-                style: TextStyle(
+              Text(
+                AppStrings.disclaimerTitle,
+                style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -74,27 +75,23 @@ class MedicalDisclaimerDialog extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildBulletPoint(
-                        title: 'أداة مساعدة وليست بديلاً عن الطبيب',
-                        body:
-                            'تطبيق Med Care وتوصيات الذكاء الاصطناعي هي أدوات مساعدة للتذكير والتوعية فقط. ولا يُعتبر التطبيق بديلاً عن الاستشارة الطبية أو التشخيص المباشر من قبل طبيب مرخص.',
+                        title: AppStrings.disclaimerBullet1Title,
+                        body: AppStrings.disclaimerBullet1Body,
                       ),
                       const SizedBox(height: 12),
                       _buildBulletPoint(
-                        title: 'حالات الطوارئ الطبية',
-                        body:
-                            'في حالة الأعراض الحادة، أو الآلام الشديدة، أو الطوارئ الطبية، يرجى الاتصال فوراً بخدمة الإسعاف أو التوجه لأقرب مستشفى.',
+                        title: AppStrings.disclaimerBullet2Title,
+                        body: AppStrings.disclaimerBullet2Body,
                       ),
                       const SizedBox(height: 12),
                       _buildBulletPoint(
-                        title: 'حماية البيانات والخصوصية (HIPAA & WHO Standards)',
-                        body:
-                            'يتم التزام أعلى معايير تشفير البيانات وحمايتها. لا يتم مشاركة بياناتك الطبية إلا مع المرافقين أو الأطباء الذين تمنحهم موافقة صريحة.',
+                        title: AppStrings.disclaimerBullet3Title,
+                        body: AppStrings.disclaimerBullet3Body,
                       ),
                       const SizedBox(height: 12),
                       _buildBulletPoint(
-                        title: 'التأكد من الجرعات الطبية',
-                        body:
-                            'يرجى دائماً مراجعة النشرة الطبية المرفقة وتوجيهات الطبيب المعالج قبل تناول أي دواء.',
+                        title: AppStrings.disclaimerBullet4Title,
+                        body: AppStrings.disclaimerBullet4Body,
                       ),
                     ],
                   ),
@@ -116,9 +113,9 @@ class MedicalDisclaimerDialog extends StatelessWidget {
                     elevation: 0,
                   ),
                   onPressed: onAccept,
-                  child: const Text(
-                    'أوافق وأفهم الشروط الطبية',
-                    style: TextStyle(
+                  child: Text(
+                    AppStrings.disclaimerAccept,
+                    style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 15,
                       fontWeight: FontWeight.w700,

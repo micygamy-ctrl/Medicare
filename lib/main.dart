@@ -132,6 +132,7 @@ class MediCareApp extends StatelessWidget {
           AppStrings.setLanguage(langState.language);
 
           return MaterialApp(
+            key: ValueKey(langState.language),
             title: AppStrings.appTitle,
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
@@ -270,11 +271,16 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
       return _pageRoute(settings, const DoctorMainPage());
   }
 
-  final patientId = name == AppRoutes.patientDetail
-      ? args?['patientId']
-      : name != null && name.startsWith(AppRoutes.patientDetailPrefix)
-          ? name.substring(AppRoutes.patientDetailPrefix.length)
-          : null;
+  String? patientId;
+  if (name == AppRoutes.patientDetail) {
+    final patientIdArg = args?['patientId'];
+    if (patientIdArg is String) {
+      patientId = patientIdArg;
+    }
+  } else if (name != null && name.startsWith(AppRoutes.patientDetailPrefix)) {
+    patientId = name.substring(AppRoutes.patientDetailPrefix.length);
+  }
+
   if (patientId is String) {
     final patientName = args?['patientName'];
     final doctor = args?['doctor'];

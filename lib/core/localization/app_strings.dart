@@ -190,9 +190,30 @@ class AppStrings {
       pick('أطعمة موصى بها', 'Recommended foods');
   static String get foodAvoid => pick('أطعمة يُفضل تجنبها', 'Foods to avoid');
   static String get safeExercise => pick('تمارين آمنة', 'Safe exercises');
-  static String get disclaimerNotice => pick(
-      'تنبيه طبي: تحليل الذكاء الاصطناعي للتوعية فقط ولا يغني عن الطبيب.',
-      'Medical notice: AI analysis is for guidance only and does not replace your physician.');
+  static String get disclaimerTitle =>
+      pick('إخلاء مسؤولية طبي وشروط الاستخدام', 'Medical Disclaimer & Terms of Use');
+  static String get disclaimerBullet1Title =>
+      pick('أداة مساعدة وليست بديلاً عن الطبيب', 'Assistance tool, not a doctor replacement');
+  static String get disclaimerBullet1Body => pick(
+      'تطبيق Med Care وتوصيات الذكاء الاصطناعي هي أدوات مساعدة للتذكير والتوعية فقط. ولا يُعتبر التطبيق بديلاً عن الاستشارة الطبية.',
+      'MediCare and AI suggestions are tools for reminders and guidance only. They do not replace professional medical advice.');
+  static String get disclaimerBullet2Title =>
+      pick('حالات الطوارئ الطبية', 'Medical Emergencies');
+  static String get disclaimerBullet2Body => pick(
+      'في حالة الأعراض الحادة، أو الآلام الشديدة، أو الطوارئ الطبية، يرجى الاتصال فوراً بخدمة الإسعاف أو التوجه لأقرب مستشفى.',
+      'In case of severe symptoms or medical emergencies, please call emergency services or visit nearest hospital immediately.');
+  static String get disclaimerBullet3Title =>
+      pick('حماية البيانات والخصوصية', 'Data Privacy & Security');
+  static String get disclaimerBullet3Body => pick(
+      'يتم التزام أعلى معايير تشفير البيانات وحمايتها. لا يتم مشاركة بياناتك الطبية إلا بموافقتك الصريحة.',
+      'We enforce strict encryption and privacy standards. Your data is shared only with explicit authorization.');
+  static String get disclaimerBullet4Title =>
+      pick('التأكد من الجرعات الطبية', 'Verify Doses');
+  static String get disclaimerBullet4Body => pick(
+      'يرجى دائماً مراجعة النشرة الطبية المرفقة وتوجيهات الطبيب المعالج قبل تناول أي دواء.',
+      'Always check your prescription guidelines and physician instructions before taking any medication.');
+  static String get disclaimerAccept =>
+      pick('أوافق وأفهم الشروط الطبية', 'I accept and understand the terms');
 
   static String get caregiverDashboard =>
       pick('لوحة المتابعة', 'Care dashboard');
@@ -396,6 +417,65 @@ class AppStrings {
   static String get onboardingSkip => pick('تخطي', 'Skip');
   static String get onboardingNext => pick('التالي', 'Next');
   static String get onboardingStart => pick('ابدأ الآن', 'Get started');
+
+  static String get pageNotFound =>
+      pick('الصفحة غير موجودة', 'Page not found');
+  static String get pageNotFoundSubtitle => pick(
+      'عذرًا، الصفحة التي طلبتها غير موجودة.',
+      'Sorry, the requested page was not found.');
+  static String get backToHome => pick('العودة للرئيسية', 'Back to home');
+
+  static String get myProfile => pick('حسابي', 'My profile');
+  static String get accountSection => pick('الحساب', 'Account');
+  static String get phoneNumber => pick('رقم الهاتف', 'Phone number');
+  static String get addPhoneNumberHint =>
+      pick('اضغط لإضافة رقم هاتفك', 'Tap to add your phone number');
+  static String get notificationsSection => pick('الإشعارات', 'Notifications');
+  static String get manageNotificationsSubtitle =>
+      pick('إدارة إشعارات المتابعة', 'Manage follow-up notifications');
+  static String get appSection => pick('التطبيق', 'App');
+  static String get aboutApp => pick('عن التطبيق', 'About app');
+  static String get privacyPolicy => pick('سياسة الخصوصية', 'Privacy policy');
+  static String get readPrivacyPolicySubtitle =>
+      pick('اقرأ سياسة الخصوصية', 'Read privacy terms');
+  static String get phoneUpdatedSuccess =>
+      pick('تم تحديث رقم الهاتف ✓', 'Phone number updated ✓');
+  static String get phoneUpdatedError =>
+      pick('فشل في تحديث رقم الهاتف', 'Failed to update phone number');
+  static String get ok => pick('حسناً', 'OK');
+  static String get gotIt => pick('فهمت', 'Got it');
+  static String get notificationSettingsTitle =>
+      pick('إعدادات الإشعارات', 'Notification settings');
+  static String get missedDoseAlertTitle =>
+      pick('تنبيه الجرعات الفائتة', 'Missed dose alert');
+  static String get missedDoseAlertSub =>
+      pick('عند تفويت المريض لجرعة', 'When patient misses a dose');
+  static String get dailySummaryAlertTitle =>
+      pick('ملخص يومي', 'Daily summary');
+  static String get dailySummaryAlertSub =>
+      pick('تقرير يومي عن حالة المريض', 'Daily report on patient status');
+  static String get lowAdherenceAlertTitle =>
+      pick('تنبيه انخفاض الالتزام', 'Low adherence alert');
+  static String get lowAdherenceAlertSub =>
+      pick('عند انخفاض الالتزام عن 50%', 'When adherence drops below 50%');
+  static String get notificationSettingsSaved =>
+      pick('تم حفظ إعدادات الإشعارات', 'Notification settings saved');
+
+  static String get vitalsHistoryTitle =>
+      pick('سجل قراءات المؤشرات الحيوية', 'Vital signs history');
+  static String get noVitalsHistory =>
+      pick('لا توجد قراءات حيوية سابقة', 'No previous vital signs readings');
+  static String get statusCritical => pick('حرج ⚠️', 'Critical ⚠️');
+  static String get statusWarning => pick('تحذير', 'Warning');
+  static String get sourceSmartwatch => pick('ساعة ذكية ⌚', 'Smartwatch ⌚');
+  static String get sourceSensor => pick('حساس بلوتوث 📡', 'Bluetooth sensor 📡');
+  static String get sourceHealthKit => pick('تطبيق الصحة', 'Health app');
+  static String get sourceManual => pick('إدخال يدوي ✍️', 'Manual entry ✍️');
+
+  static String get patientFile => pick('ملف المريض', 'Patient file');
+  static String get couldNotLoadPatientData =>
+      pick('تعذر تحميل بيانات المريض', 'Could not load patient data');
+  static String get notSpecified => pick('غير محدد', 'Not specified');
 
   // ── General ──────────────────────────────────────────────────────────────
   static String get close => pick('إغلاق', 'Close');

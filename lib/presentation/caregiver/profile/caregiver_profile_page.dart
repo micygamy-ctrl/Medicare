@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/localization/app_language_cubit.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../domain/entities/user.dart';
@@ -14,9 +16,11 @@ class CaregiverProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AppLanguageCubit>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('حسابي')),
+      appBar: AppBar(title: Text(AppStrings.myProfile)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -79,9 +83,9 @@ class CaregiverProfilePage extends StatelessWidget {
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
-                      'مقدم رعاية',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.roleCaregiver,
+                      style: const TextStyle(
                         fontFamily: 'Cairo',
                         color: Colors.white,
                         fontSize: 13,
@@ -96,20 +100,20 @@ class CaregiverProfilePage extends StatelessWidget {
 
             // Account Settings
             _SettingsSection(
-              title: 'الحساب',
+              title: AppStrings.accountSection,
               items: [
                 _SettingsItem(
                   icon: Icons.phone_outlined,
-                  title: 'رقم الهاتف',
+                  title: AppStrings.phoneNumber,
                   subtitle: user.phone?.isNotEmpty == true
                       ? user.phone!
-                      : 'اضغط لإضافة رقم هاتفك',
+                      : AppStrings.addPhoneNumberHint,
                   onTap: () => _editPhone(context),
                 ),
                 _SettingsItem(
                   icon: Icons.notifications_outlined,
-                  title: 'الإشعارات',
-                  subtitle: 'إدارة إشعارات المتابعة',
+                  title: AppStrings.notificationsSection,
+                  subtitle: AppStrings.manageNotificationsSubtitle,
                   onTap: () => _showNotificationSettings(context),
                 ),
               ],
@@ -118,18 +122,18 @@ class CaregiverProfilePage extends StatelessWidget {
 
             // App Settings
             _SettingsSection(
-              title: 'التطبيق',
+              title: AppStrings.appSection,
               items: [
                 _SettingsItem(
                   icon: Icons.info_outline_rounded,
-                  title: 'عن التطبيق',
-                  subtitle: 'Med Care v1.0.0',
+                  title: AppStrings.aboutApp,
+                  subtitle: 'MediCare v1.0.0',
                   onTap: () => _showAboutDialog(context),
                 ),
                 _SettingsItem(
                   icon: Icons.privacy_tip_outlined,
-                  title: 'سياسة الخصوصية',
-                  subtitle: 'اقرأ سياسة الخصوصية',
+                  title: AppStrings.privacyPolicy,
+                  subtitle: AppStrings.readPrivacyPolicySubtitle,
                   onTap: () => _showPrivacyPolicy(context),
                 ),
               ],
@@ -150,9 +154,9 @@ class CaregiverProfilePage extends StatelessWidget {
                   ),
                 ),
                 icon: const Icon(Icons.logout_rounded),
-                label: const Text(
-                  'تسجيل الخروج',
-                  style: TextStyle(
+                label: Text(
+                  AppStrings.signOut,
+                  style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
@@ -168,68 +172,68 @@ class CaregiverProfilePage extends StatelessWidget {
   }
 
   // Edit Phone
- void _editPhone(BuildContext context) {
-  final controller = TextEditingController(text: user.phone ?? '');
-  showDialog(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      title: const Text('رقم الهاتف',
-          style: TextStyle(fontFamily: 'Cairo')),
-      content: TextField(
-        controller: controller,
-        keyboardType: TextInputType.phone,
-        textDirection: TextDirection.ltr,
-        decoration: const InputDecoration(
-          hintText: '+20 1XX XXX XXXX',
-          prefixIcon:
-              Icon(Icons.phone_outlined, color: AppColors.textHint),
+  void _editPhone(BuildContext context) {
+    final controller = TextEditingController(text: user.phone ?? '');
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppStrings.phoneNumber,
+            style: const TextStyle(fontFamily: 'Cairo')),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.phone,
+          textDirection: TextDirection.ltr,
+          decoration: const InputDecoration(
+            hintText: '+20 1XX XXX XXXX',
+            prefixIcon:
+                Icon(Icons.phone_outlined, color: AppColors.textHint),
+          ),
         ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx),
-          child: const Text('إلغاء',
-              style: TextStyle(fontFamily: 'Cairo')),
-        ),
-        ElevatedButton(
-          onPressed: () async {
-            if (controller.text.isNotEmpty) {
-              Navigator.pop(ctx);
-              try {
-                await getIt<IAuthRepository>().updateProfile(
-                  userId: user.uid,
-                  phone: controller.text.trim(),
-                );
-                if (context.mounted) {
-                  await context.read<AuthCubit>().checkAuthState();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('تم تحديث رقم الهاتف ✓'),
-                      backgroundColor: AppColors.success,
-                      behavior: SnackBarBehavior.floating,
-                    ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(AppStrings.cancel,
+                style: const TextStyle(fontFamily: 'Cairo')),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (controller.text.isNotEmpty) {
+                Navigator.pop(ctx);
+                try {
+                  await getIt<IAuthRepository>().updateProfile(
+                    userId: user.uid,
+                    phone: controller.text.trim(),
                   );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('فشل في تحديث رقم الهاتف'),
-                      backgroundColor: AppColors.error,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
+                  if (context.mounted) {
+                    await context.read<AuthCubit>().checkAuthState();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(AppStrings.phoneUpdatedSuccess),
+                        backgroundColor: AppColors.success,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(AppStrings.phoneUpdatedError),
+                        backgroundColor: AppColors.error,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
                 }
               }
-            }
-          },
-          child: const Text('حفظ',
-              style: TextStyle(fontFamily: 'Cairo')),
-        ),
-      ],
-    ),
-  );
-}
+            },
+            child: Text(AppStrings.save,
+                style: const TextStyle(fontFamily: 'Cairo')),
+          ),
+        ],
+      ),
+    );
+  }
 
   // Notification Settings
   void _showNotificationSettings(BuildContext context) {
@@ -261,9 +265,9 @@ class CaregiverProfilePage extends StatelessWidget {
                   color: AppColors.primary, size: 40),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Med Care',
-              style: TextStyle(
+            Text(
+              AppStrings.appTitle,
+              style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -271,14 +275,14 @@ class CaregiverProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             const Text(
-              'الإصدار 1.0.0',
+              'v1.0.0',
               style: TextStyle(
                   fontFamily: 'Cairo', color: AppColors.textSecondary),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'تطبيق متخصص في إدارة الأدوية ومتابعة صحة المرضى، يربط المريض بمقدم الرعاية لضمان الالتزام بالعلاج.',
-              style: TextStyle(
+            Text(
+              AppStrings.welcomeSubtitle,
+              style: const TextStyle(
                 fontFamily: 'Cairo',
                 color: AppColors.textSecondary,
                 height: 1.6,
@@ -290,8 +294,8 @@ class CaregiverProfilePage extends StatelessWidget {
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('حسناً',
-                style: TextStyle(fontFamily: 'Cairo')),
+            child: Text(AppStrings.ok,
+                style: const TextStyle(fontFamily: 'Cairo')),
           ),
         ],
       ),
@@ -328,9 +332,9 @@ class CaregiverProfilePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'سياسة الخصوصية',
-                style: TextStyle(
+              Text(
+                AppStrings.privacyPolicy,
+                style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -338,37 +342,16 @@ class CaregiverProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _PrivacySection(
-                title: '1. جمع البيانات',
-                content:
-                    'نجمع فقط البيانات الضرورية لتشغيل التطبيق، بما في ذلك: معلومات الحساب، بيانات الأدوية، وسجلات الاستخدام.',
-              ),
-              _PrivacySection(
-                title: '2. استخدام البيانات',
-                content:
-                    'تُستخدم البيانات فقط لتوفير خدمات التطبيق وتحسين تجربة المستخدم. لا نشارك بياناتك مع أطراف ثالثة.',
-              ),
-              _PrivacySection(
-                title: '3. أمان البيانات',
-                content:
-                    'نستخدم تشفيراً متقدماً لحماية بياناتك. جميع البيانات مخزنة بأمان على خوادم Firebase.',
-              ),
-              _PrivacySection(
-                title: '4. حقوقك',
-                content:
-                    'يحق لك الوصول إلى بياناتك أو تعديلها أو حذفها في أي وقت من خلال إعدادات التطبيق.',
-              ),
-              _PrivacySection(
-                title: '5. التواصل',
-                content:
-                    'لأي استفسارات حول سياسة الخصوصية، يرجى التواصل معنا عبر البريد الإلكتروني.',
+                title: AppStrings.disclaimerBullet3Title,
+                content: AppStrings.disclaimerBullet3Body,
               ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('فهمت',
-                      style: TextStyle(fontFamily: 'Cairo')),
+                  child: Text(AppStrings.gotIt,
+                      style: const TextStyle(fontFamily: 'Cairo')),
                 ),
               ),
             ],
@@ -383,15 +366,15 @@ class CaregiverProfilePage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تسجيل الخروج',
-            style: TextStyle(fontFamily: 'Cairo')),
-        content: const Text('هل أنت متأكد من تسجيل الخروج؟',
-            style: TextStyle(fontFamily: 'Cairo')),
+        title: Text(AppStrings.signOut,
+            style: const TextStyle(fontFamily: 'Cairo')),
+        content: Text(AppStrings.signOutQuestion,
+            style: const TextStyle(fontFamily: 'Cairo')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء',
-                style: TextStyle(fontFamily: 'Cairo')),
+            child: Text(AppStrings.cancel,
+                style: const TextStyle(fontFamily: 'Cairo')),
           ),
           ElevatedButton(
             onPressed: () {
@@ -400,8 +383,8 @@ class CaregiverProfilePage extends StatelessWidget {
             },
             style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.error),
-            child: const Text('تسجيل الخروج',
-                style: TextStyle(fontFamily: 'Cairo')),
+            child: Text(AppStrings.signOut,
+                style: const TextStyle(fontFamily: 'Cairo')),
           ),
         ],
       ),
@@ -441,9 +424,9 @@ class _NotificationSettingsSheetState
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'إعدادات الإشعارات',
-            style: TextStyle(
+          Text(
+            AppStrings.notificationSettingsTitle,
+            style: const TextStyle(
               fontFamily: 'Cairo',
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -451,20 +434,20 @@ class _NotificationSettingsSheetState
           ),
           const SizedBox(height: 16),
           _NotificationSwitch(
-            title: 'تنبيه الجرعات الفائتة',
-            subtitle: 'عند تفويت المريض لجرعة',
+            title: AppStrings.missedDoseAlertTitle,
+            subtitle: AppStrings.missedDoseAlertSub,
             value: _missedDoseAlert,
             onChanged: (v) => setState(() => _missedDoseAlert = v),
           ),
           _NotificationSwitch(
-            title: 'ملخص يومي',
-            subtitle: 'تقرير يومي عن حالة المريض',
+            title: AppStrings.dailySummaryAlertTitle,
+            subtitle: AppStrings.dailySummaryAlertSub,
             value: _dailySummary,
             onChanged: (v) => setState(() => _dailySummary = v),
           ),
           _NotificationSwitch(
-            title: 'تنبيه انخفاض الالتزام',
-            subtitle: 'عند انخفاض الالتزام عن 50%',
+            title: AppStrings.lowAdherenceAlertTitle,
+            subtitle: AppStrings.lowAdherenceAlertSub,
             value: _lowAdherenceAlert,
             onChanged: (v) => setState(() => _lowAdherenceAlert = v),
           ),
@@ -475,14 +458,14 @@ class _NotificationSettingsSheetState
               onPressed: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('تم حفظ إعدادات الإشعارات'),
+                  SnackBar(
+                    content: Text(AppStrings.notificationSettingsSaved),
                     backgroundColor: AppColors.success,
                   ),
                 );
               },
-              child: const Text('حفظ',
-                  style: TextStyle(fontFamily: 'Cairo')),
+              child: Text(AppStrings.save,
+                  style: const TextStyle(fontFamily: 'Cairo')),
             ),
           ),
         ],

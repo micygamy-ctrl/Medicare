@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_routes.dart';
+import '../../../core/localization/app_strings.dart';
 
 class UnknownRoutePage extends StatelessWidget {
   final String? routeName;
@@ -9,11 +10,11 @@ class UnknownRoutePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routeLabel = routeName == null || routeName!.isEmpty
-        ? 'المسار المطلوب'
+        ? ''
         : routeName!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('الصفحة غير موجودة')),
+      appBar: AppBar(title: Text(AppStrings.pageNotFound)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -22,16 +23,18 @@ class UnknownRoutePage extends StatelessWidget {
             children: [
               const Icon(Icons.error_outline, size: 64),
               const SizedBox(height: 16),
-              const Text(
-                'عذرًا، الصفحة التي طلبتها غير موجودة.',
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
               Text(
-                routeLabel,
+                AppStrings.pageNotFoundSubtitle,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall,
               ),
+              if (routeLabel.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  routeLabel,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () =>
@@ -40,7 +43,7 @@ class UnknownRoutePage extends StatelessWidget {
                       AppRoutes.splash,
                       (_) => false,
                     ),
-                child: const Text('العودة للرئيسية'),
+                child: Text(AppStrings.backToHome),
               ),
             ],
           ),

@@ -37,6 +37,7 @@ Future<void> alarmCallback(int id, Map<String, dynamic> params) async {
         visibility: NotificationVisibility.public,
         fullScreenIntent: true,
         category: AndroidNotificationCategory.alarm,
+        audioAttributesUsage: AudioAttributesUsage.alarm,
         autoCancel: true,
         ongoing: false,
         actions: [
